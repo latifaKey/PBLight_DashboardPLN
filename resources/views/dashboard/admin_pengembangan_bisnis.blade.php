@@ -1,76 +1,147 @@
-{{-- resources/views/dashboard/admin_pengembangan_bisnis.blade.php --}}
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Kinerja - Admin Pengembangan Bisnis</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <style>
-    /* Styling seperti yang sudah dibuat di admin_dashboard.blade.php */
-  </style>
-</head>
-<body>
-  <div class="container">
-    <aside class="sidebar">
-      <img src="/images/logoPLN.png" alt="Logo PLN" />
-      <ul class="sidebar-menu">
-        <li><a href="{{ route('dashboard') }}"><img src="/images/dashboard.png" /> Dashboard</a></li>
-        <li><a href="{{ route('realisasi.index') }}"><img src="/images/dataKinerja.png" /> Input Realisasi</a></li>
-        <li><a href="{{ route('eksporPdf.index') }}"><img src="/images/pdf.png" /> Ekspor PDF</a></li>
-      </ul>
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="logout-btn">
-          <img src="/images/logout.png" alt="Logout" /> Log Out
-        </button>
-      </form>
-    </aside>
+@extends('layouts.app')
 
-    <main class="main">
-      <div class="dashboard-header">
-        <h2>Hi, Admin Pengembangan Bisnis!</h2>
+@section('title', 'Dashboard Kinerja - Admin Pengembangan Bisnis')
+@section('page_title', 'DASHBOARD KINERJA PENGEMBANGAN BISNIS')
+
+@section('content')
+<div class="container-fluid px-4">
+  <div class="dashboard-content">
+    <!-- Stat Cards -->
+    <div class="dashboard-row mt-4">
+      <div class="dashboard-col">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3 class="stat-title">Proyek Berjalan</h3>
+            <div class="stat-icon">
+              <i class="fas fa-project-diagram"></i>
+            </div>
+          </div>
+          <div class="stat-value">5</div>
+          <p class="stat-description">Jumlah proyek dalam pengerjaan</p>
+        </div>
       </div>
 
-      <div class="grid">
-        <div class="card dark">
-          <h3>Overall Business Performance</h3>
-          <p>5 Projects Ongoing | 2 Completed</p>
-        </div>
-        <div class="card">
-          <h3>Project Pipeline</h3>
-          <p class="placeholder-text">Business development in process...</p>
-        </div>
-        <div class="card">
-          <h3>Business Growth</h3>
-          <div class="progress-circle">75%</div>
-        </div>
-        <div class="card">
-          <h3>Key Goals</h3>
-          <ul>
-            <li>✓ Develop Strategic Partnership</li>
-            <li>○ Identify New Business Opportunities</li>
-            <li>○ Launch New Product</li>
-            <li>○ Expand Market Share</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Current Projects</h3>
-          <div class="tasks">
-            <div class="task">Market Research</div>
-            <div class="task">Business Partnership Negotiation</div>
+      <div class="dashboard-col">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3 class="stat-title">Proyek Selesai</h3>
+            <div class="stat-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
           </div>
+          <div class="stat-value">2</div>
+          <p class="stat-description">Proyek yang telah selesai</p>
         </div>
-        <div class="card">
-          <h3>Last Business Initiatives</h3>
-          <div class="tasks">
-            <div class="task black">New Product Launch</div>
-            <div class="task">Brand Positioning Strategy</div>
-            <div class="task">Strategic Acquisition</div>
+      </div>
+
+      <div class="dashboard-col">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3 class="stat-title">Pertumbuhan Bisnis</h3>
+            <div class="stat-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+          <div class="stat-value">75%</div>
+          <p class="stat-description">Tingkat pertumbuhan bisnis</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pipeline Proyek -->
+    <div class="chart-container mt-4">
+      <h3 class="chart-title">
+        <i class="fas fa-tasks mr-2"></i>
+        Target Bisnis Strategis
+      </h3>
+      <div class="p-3">
+        <ul class="target-list">
+          <li class="completed">Pengembangan Kemitraan Strategis</li>
+          <li>Identifikasi Peluang Bisnis Baru</li>
+          <li>Peluncuran Produk Baru</li>
+          <li>Ekspansi Pangsa Pasar</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="dashboard-row mt-4">
+      <div class="dashboard-col">
+        <div class="chart-container">
+          <h3 class="chart-title">
+            <i class="fas fa-rocket mr-2"></i>
+            Proyek Aktif
+          </h3>
+          <div class="p-3">
+            <div class="task-item">Riset Pasar</div>
+            <div class="task-item">Negosiasi Kemitraan Bisnis</div>
           </div>
         </div>
       </div>
-    </main>
+
+      <div class="dashboard-col">
+        <div class="chart-container">
+          <h3 class="chart-title">
+            <i class="fas fa-lightbulb mr-2"></i>
+            Inisiatif Bisnis Terbaru
+          </h3>
+          <div class="p-3">
+            <div class="task-item highlight">Peluncuran Produk Baru</div>
+            <div class="task-item">Strategi Positioning Brand</div>
+            <div class="task-item">Akuisisi Strategis</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</body>
-</html>
+</div>
+@endsection
+
+@section('styles')
+<style>
+  .target-list {
+    list-style-type: none;
+    padding-left: 10px;
+  }
+
+  .target-list li {
+    padding: 8px 0;
+    position: relative;
+    padding-left: 25px;
+    color: var(--pln-text-secondary);
+  }
+
+  .target-list li:before {
+    content: "○";
+    position: absolute;
+    left: 0;
+    color: var(--pln-text-secondary);
+  }
+
+  .target-list li.completed {
+    color: var(--pln-text);
+  }
+
+  .target-list li.completed:before {
+    content: "✓";
+    color: var(--pln-light-blue);
+  }
+
+  .task-item {
+    background: var(--pln-surface);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--pln-light-blue);
+    transition: all 0.3s ease;
+  }
+
+  .task-item:hover {
+    transform: translateX(5px);
+  }
+
+  .task-item.highlight {
+    background: rgba(0, 156, 222, 0.1);
+    border-left: 3px solid var(--pln-light-blue);
+  }
+</style>
+@endsection

@@ -4,7 +4,7 @@
 @section('page_title', 'DASHBOARD KINERJA')
 
 @section('styles')
-<style>
+  <style>
   .dashboard-content {
     max-width: 1800px;
     margin: 0 auto;
@@ -140,6 +140,8 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 25px;
     margin-top: 40px;
+    max-height: 800px;
+    overflow-y: auto;
   }
 
   .detail-section {
@@ -151,6 +153,36 @@
     box-shadow: 0 8px 20px var(--pln-shadow);
     position: relative;
     overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .detail-section::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .detail-section::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  .detail-section::-webkit-scrollbar-thumb {
+    background: var(--pln-light-blue);
+    border-radius: 10px;
+  }
+
+  .details-grid::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .details-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+
+  .details-grid::-webkit-scrollbar-thumb {
+    background: var(--pln-light-blue);
+    border-radius: 10px;
   }
 
   .detail-section::before {
@@ -161,11 +193,6 @@
     width: 100%;
     height: 4px;
     background: linear-gradient(90deg, var(--pln-blue), var(--pln-light-blue));
-  }
-
-  .detail-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px var(--pln-shadow);
   }
 
   .detail-title {
@@ -413,8 +440,8 @@
     .dashboard-col {
       flex: 0 0 100%;
     }
-  }
-</style>
+    }
+  </style>
 @endsection
 
 @section('content')
@@ -427,7 +454,7 @@
           <h3 class="stat-title">NKO Score</h3>
           <div class="stat-icon">
             <i class="fas fa-chart-line"></i>
-          </div>
+      </div>
         </div>
         <div class="stat-value">{{ $data['nko'] }}</div>
         <p class="stat-description">Nilai Kinerja Organisasi</p>
@@ -444,7 +471,7 @@
         <div class="stat-value">100</div>
         <p class="stat-description">Target Pencapaian</p>
       </div>
-    </div>
+            </div>
     <div class="dashboard-col">
       <div class="stat-card">
         <div class="stat-header">

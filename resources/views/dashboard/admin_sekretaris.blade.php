@@ -1,76 +1,147 @@
-{{-- resources/views/dashboard/admin_sekretaris.blade.php --}}
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Kinerja - Admin Sekretaris Perusahaan</title>
-  <link rel="stylesheet" href="/css/style.css">
-  <style>
-    /* Styling seperti yang sudah dibuat di admin_dashboard.blade.php */
-  </style>
-</head>
-<body>
-  <div class="container">
-    <aside class="sidebar">
-      <img src="/images/logoPLN.png" alt="Logo PLN" />
-      <ul class="sidebar-menu">
-        <li><a href="{{ route('dashboard') }}"><img src="/images/dashboard.png" /> Dashboard</a></li>
-        <li><a href="{{ route('realisasi.index') }}"><img src="/images/dataKinerja.png" /> Input Realisasi</a></li>
-        <li><a href="{{ route('eksporPdf.index') }}"><img src="/images/pdf.png" /> Ekspor PDF</a></li>
-      </ul>
-      <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit" class="logout-btn">
-          <img src="/images/logout.png" alt="Logout" /> Log Out
-        </button>
-      </form>
-    </aside>
+@extends('layouts.app')
 
-    <main class="main">
-      <div class="dashboard-header">
-        <h2>Hi, Admin Sekretaris Perusahaan!</h2>
+@section('title', 'Dashboard Kinerja - Admin Sekretaris Perusahaan')
+@section('page_title', 'DASHBOARD KINERJA SEKRETARIS PERUSAHAAN')
+
+@section('content')
+<div class="container-fluid px-4">
+  <div class="dashboard-content">
+    <!-- Stat Cards -->
+    <div class="dashboard-row mt-4">
+      <div class="dashboard-col">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3 class="stat-title">Dokumen Terdaftar</h3>
+            <div class="stat-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          </div>
+          <div class="stat-value">24</div>
+          <p class="stat-description">Total dokumen perusahaan terdaftar</p>
+        </div>
       </div>
 
-      <div class="grid">
-        <div class="card dark">
-          <h3>Over all information</h3>
-          <p>15 Documents Processed | 3 Pending</p>
-        </div>
-        <div class="card">
-          <h3>Document Status</h3>
-          <p class="placeholder-text">Pending approvals...</p>
-        </div>
-        <div class="card">
-          <h3>Document Completion</h3>
-          <div class="progress-circle">80%</div>
-        </div>
-        <div class="card">
-          <h3>Monthly Administrative Goals</h3>
-          <ul>
-            <li>✓ Approve Legal Documents</li>
-            <li>○ Organize Board Meetings</li>
-            <li>○ Submit Monthly Report</li>
-            <li>○ Archive Corporate Files</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Task In Process</h3>
-          <div class="tasks">
-            <div class="task">Board Meeting Scheduling</div>
-            <div class="task">Prepare Monthly Report</div>
+      <div class="dashboard-col">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3 class="stat-title">Pertemuan</h3>
+            <div class="stat-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
           </div>
+          <div class="stat-value">8</div>
+          <p class="stat-description">Pertemuan terjadwal minggu ini</p>
         </div>
-        <div class="card">
-          <h3>Last Administrative Tasks</h3>
-          <div class="tasks">
-            <div class="task black">Corporate Document Update</div>
-            <div class="task">Annual Report Filing</div>
-            <div class="task">Legal Compliance Review</div>
+      </div>
+
+      <div class="dashboard-col">
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3 class="stat-title">Korespondensi</h3>
+            <div class="stat-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+          </div>
+          <div class="stat-value">95%</div>
+          <p class="stat-description">Tingkat penyelesaian korespondensi</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bagian Target -->
+    <div class="chart-container mt-4">
+      <h3 class="chart-title">
+        <i class="fas fa-tasks mr-2"></i>
+        Target Bulanan
+      </h3>
+      <div class="p-3">
+        <ul class="target-list">
+          <li class="completed">Penjadwalan Rapat Direksi</li>
+          <li class="completed">Pembaruan Dokumen GCG</li>
+          <li>Koordinasi Hubungan Investor</li>
+          <li>Persiapan Laporan Tahunan</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="dashboard-row mt-4">
+      <div class="dashboard-col">
+        <div class="chart-container">
+          <h3 class="chart-title">
+            <i class="fas fa-spinner mr-2"></i>
+            Tugas Aktif
+          </h3>
+          <div class="p-3">
+            <div class="task-item">Persiapan Rapat Direksi</div>
+            <div class="task-item">Penyusunan Notulensi</div>
           </div>
         </div>
       </div>
-    </main>
+
+      <div class="dashboard-col">
+        <div class="chart-container">
+          <h3 class="chart-title">
+            <i class="fas fa-check mr-2"></i>
+            Aktivitas Terselesaikan
+          </h3>
+          <div class="p-3">
+            <div class="task-item highlight">Distribusi Informasi Pemegang Saham</div>
+            <div class="task-item">Pembaruan Dokumen GCG</div>
+            <div class="task-item">Penyusunan Agenda Direksi</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</body>
-</html>
+</div>
+@endsection
+
+@section('styles')
+<style>
+  .target-list {
+    list-style-type: none;
+    padding-left: 10px;
+  }
+
+  .target-list li {
+    padding: 8px 0;
+    position: relative;
+    padding-left: 25px;
+    color: var(--pln-text-secondary);
+  }
+
+  .target-list li:before {
+    content: "○";
+    position: absolute;
+    left: 0;
+    color: var(--pln-text-secondary);
+  }
+
+  .target-list li.completed {
+    color: var(--pln-text);
+  }
+
+  .target-list li.completed:before {
+    content: "✓";
+    color: var(--pln-light-blue);
+  }
+
+  .task-item {
+    background: var(--pln-surface);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--pln-light-blue);
+    transition: all 0.3s ease;
+  }
+
+  .task-item:hover {
+    transform: translateX(5px);
+  }
+
+  .task-item.highlight {
+    background: rgba(0, 156, 222, 0.1);
+    border-left: 3px solid var(--pln-light-blue);
+  }
+</style>
+@endsection

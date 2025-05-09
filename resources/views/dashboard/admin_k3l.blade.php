@@ -167,7 +167,11 @@
         <h2>Hi, Admin K3L!</h2>
       </div>
 
-
+      @php
+      // Redirect ke admin.blade.php
+      header('Location: ' . route('dashboard'));
+      exit;
+      @endphp
     </main>
   </div>
 </body>
