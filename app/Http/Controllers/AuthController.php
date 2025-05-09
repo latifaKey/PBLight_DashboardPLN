@@ -50,14 +50,13 @@ class AuthController extends Controller
             $allowedRoles = [
                 'asisten_manager',
                 'pic_keuangan',
-                'pic_risiko_manajemen',
-                'pic_skreperusahaan',
+                'pic_manajemen_risiko',
+                'pic_sekretaris_perusahaan',
                 'pic_perencanaan_operasi',
                 'pic_pengembangan_bisnis',
                 'pic_human_capital',
                 'pic_k3l',
                 'pic_perencanaan_korporat',
-                'pic_sekretaris_perusahaan',
                 'pic_hukum',
                 'karyawan',
             ];

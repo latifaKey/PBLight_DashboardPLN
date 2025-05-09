@@ -18,15 +18,29 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
+        // Jika user belum login, redirect ke halaman login
         if (Auth::guest()) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Jika user tidak memiliki salah satu role yang diizinkan
-        if (!in_array(Auth::user()->role, $roles)) {
-            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke fitur ini.');
+        // Konversi parameter menjadi array jika multi-role
+        $rolesArray = [];
+        foreach ($roles as $role) {
+            // Jika role berisi koma, pecah menjadi array
+            if (strpos($role, ',') !== false) {
+                $explodedRoles = explode(',', $role);
+                $rolesArray = array_merge($rolesArray, $explodedRoles);
+            } else {
+                $rolesArray[] = $role;
+            }
         }
 
-        return $next($request);
+        // Jika user memiliki salah satu role yang diizinkan, lanjutkan request
+        if (in_array(Auth::user()->role, $rolesArray)) {
+            return $next($request);
+        }
+
+        // Jika user tidak memiliki role yang diizinkan, redirect dengan pesan error
+        return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke fitur ini.');
     }
 }

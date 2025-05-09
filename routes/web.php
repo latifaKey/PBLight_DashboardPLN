@@ -26,7 +26,7 @@ use App\Models\NilaiKPI;
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 
     // Proses login
-    Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -148,14 +148,8 @@ use App\Models\NilaiKPI;
         Route::post('/ekspor-pdf/pilar', [EksporPdfController::class, 'eksporPilar'])->name('eksporPdf.pilar');
         Route::post('/ekspor-pdf/keseluruhan', [EksporPdfController::class, 'eksporKeseluruhan'])->name('eksporPdf.keseluruhan');
 
-        // CRUD Akun (bisa kasih middleware khusus nanti, misal hanya untuk asisten manager)
-        Route::get('/akun', [AkunController::class, 'index'])->name('akun.index');
-        Route::get('/akun/create', [AkunController::class, 'create'])->name('akun.create');
-        Route::post('/akun', [AkunController::class, 'store'])->name('akun.store');
-        Route::get('/akun/{id}', [AkunController::class, 'show'])->name('akun.show');
-        Route::get('/akun/{id}/edit', [AkunController::class, 'edit'])->name('akun.edit');
-        Route::put('/akun/{id}', [AkunController::class, 'update'])->name('akun.update');
-        Route::delete('/akun/{id}', [AkunController::class, 'destroy'])->name('akun.destroy');
+        // CRUD Akun - sudah dikonfigurasi di controller
+        Route::resource('akun', AkunController::class);
 
         // Notifikasi
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
@@ -177,9 +171,8 @@ use App\Models\NilaiKPI;
         });
 
         // ========== ROUTES UNTUK MASTER ADMIN (ASISTEN MANAJER) ==========
-        Route::middleware(['role:asisten_manager'])->group(function () {
-            // Manajemen Akun
-            Route::resource('akun', AkunController::class);
+        Route::middleware(['auth'])->group(function () {
+            // Middleware role sudah dihapus, karena pengecekan role dilakukan di controller
 
             // Verifikasi KPI
             Route::resource('verifikasi', VerifikasiController::class)->except(['create', 'edit', 'store']);
@@ -205,11 +198,11 @@ use App\Models\NilaiKPI;
         });
 
         // ========== ROUTES UNTUK ADMIN (PIC BIDANG) ==========
-        Route::middleware(['role:pic_keuangan,pic_manajemen_risiko,pic_sekretaris_perusahaan,pic_perencanaan_operasi,pic_pengembangan_bisnis,pic_human_capital,pic_k3l,pic_perencanaan_korporat,pic_hukum'])->group(function () {
-            // Manajemen KPI Bidang
+        Route::middleware(['auth'])->group(function () {
+            // Manajemen KPI Bidang - tambahkan pengecekan role di controller sebagai ganti middleware
             Route::resource('realisasi', RealisasiController::class)->except(['destroy']);
 
-            // Data Kinerja Bidang
+            // Data Kinerja Bidang - tambahkan pengecekan role di controller sebagai ganti middleware
             Route::resource('dataKinerja', DataKinerjaController::class)->except(['destroy']);
         });
 
@@ -221,92 +214,92 @@ use App\Models\NilaiKPI;
         Route::get('/kpi/{id}', [KPIController::class, 'show'])->name('kpi.show');
 
         // Routes khusus admin & master admin
-        Route::middleware(['role:asisten_manager,pic_keuangan,pic_manajemen_risiko,pic_sekretaris_perusahaan,pic_perencanaan_operasi,pic_pengembangan_bisnis,pic_human_capital,pic_k3l,pic_perencanaan_korporat,pic_hukum'])->group(function () {
+        Route::middleware(['auth'])->group(function () {
             Route::get('/kpi/create', [KPIController::class, 'create'])->name('kpi.create');
             Route::post('/kpi', [KPIController::class, 'store'])->name('kpi.store');
         });
-
-        // ========== DASHBOARD LEGACY (DEPRECATED) ==========
-        // Dashboard admin lama untuk backward compatibility
-        Route::get('/dashboard/admin/keuangan', function () {
-            return view('dashboard.admin_keuangan');
-        })->name('dashboard.admin.keuangan');
-
-        Route::get('/dashboard/admin/risiko', function () {
-            return view('dashboard.admin_risiko');
-        })->name('dashboard.admin.risiko');
-
-        Route::get('/dashboard/admin/skreperusahaan', function () {
-            return view('dashboard.admin_skreperusahaan');
-        })->name('dashboard.admin.skreperusahaan');
-
-        Route::get('/dashboard/admin/perencanaan-operasi', function () {
-            return view('dashboard.admin_perencanaan_operasi');
-        })->name('dashboard.admin.perencanaan_operasi');
-
-        Route::get('/dashboard/admin/pengembangan-bisnis', function () {
-            return view('dashboard.admin_pengembangan_bisnis');
-        })->name('dashboard.admin.pengembangan_bisnis');
-
-        Route::get('/dashboard/admin/human-capital', function () {
-            return view('dashboard.admin_human_capital');
-        })->name('dashboard.admin.human_capital');
-
-        Route::get('/dashboard/admin/k3l', function () {
-            return view('dashboard.admin_k3l');
-        })->name('dashboard.admin.k3l');
-
-        Route::get('/dashboard/admin/perencanaan-korporat', function () {
-            return view('dashboard.admin_perencanaan_korporat');
-        })->name('dashboard.admin.perencanaan_korporat');
-
-        Route::get('/dashboard/admin/sekretaris-perusahaan', function () {
-            return view('dashboard.admin_sekretaris');
-        })->name('dashboard.admin.sekretaris_perusahaan');
-
-        Route::get('/dashboard/admin/hukum', function () {
-            // Menampilkan dashboard hukum khusus
-            $user = Auth::user();
-            $tahun = request('tahun', date('Y'));
-            $bulan = request('bulan', date('m'));
-            $periodeTipe = request('periode_tipe', 'bulanan');
-
-            // Dapatkan bidang hukum
-            $bidang = Bidang::where('role_pic', 'pic_hukum')->first();
-
-            if (!$bidang) {
-                return redirect()->route('dashboard')->with('error', 'Bidang tidak ditemukan untuk PIC ini.');
-            }
-
-            // Dapatkan indikator untuk bidang hukum
-            $indikators = Indikator::where('bidang_id', $bidang->id)
-                ->where('aktif', true)
-                ->orderBy('kode')
-                ->get();
-
-            // Dapatkan nilai KPI untuk indikator-indikator tersebut
-            foreach ($indikators as $indikator) {
-                $nilaiKPI = NilaiKPI::where('indikator_id', $indikator->id)
-                    ->where('tahun', $tahun)
-                    ->where('bulan', $bulan)
-                    ->where('periode_tipe', $periodeTipe)
-                    ->first();
-
-                $indikator->nilai_persentase = $nilaiKPI ? $nilaiKPI->persentase : 0;
-                $indikator->nilai_absolut = $nilaiKPI ? $nilaiKPI->nilai : 0;
-                $indikator->diverifikasi = $nilaiKPI ? $nilaiKPI->diverifikasi : false;
-            }
-
-            // Hitung rata-rata nilai KPI untuk bidang ini
-            $totalNilai = 0;
-            foreach ($indikators as $indikator) {
-                $totalNilai += $indikator->nilai_persentase;
-            }
-
-            $rataRata = $indikators->count() > 0 ? round($totalNilai / $indikators->count(), 2) : 0;
-
-            // Tampilkan view khusus admin_hukum
-            return view('dashboard.admin_hukum', compact('bidang', 'indikators', 'rataRata', 'tahun', 'bulan'));
-        })->name('dashboard.admin.hukum');
     });
+
+    // ========== DASHBOARD LEGACY (DEPRECATED) ==========
+    // Dashboard admin lama untuk backward compatibility
+    Route::get('/dashboard/admin/keuangan', function () {
+        return view('dashboard.admin_keuangan');
+    })->name('dashboard.admin.keuangan');
+
+    Route::get('/dashboard/admin/risiko', function () {
+        return view('dashboard.admin_risiko');
+    })->name('dashboard.admin.risiko');
+
+    Route::get('/dashboard/admin/skreperusahaan', function () {
+        return view('dashboard.admin_skreperusahaan');
+    })->name('dashboard.admin.skreperusahaan');
+
+    Route::get('/dashboard/admin/perencanaan-operasi', function () {
+        return view('dashboard.admin_perencanaan_operasi');
+    })->name('dashboard.admin.perencanaan_operasi');
+
+    Route::get('/dashboard/admin/pengembangan-bisnis', function () {
+        return view('dashboard.admin_pengembangan_bisnis');
+    })->name('dashboard.admin.pengembangan_bisnis');
+
+    Route::get('/dashboard/admin/human-capital', function () {
+        return view('dashboard.admin_human_capital');
+    })->name('dashboard.admin.human_capital');
+
+    Route::get('/dashboard/admin/k3l', function () {
+        return view('dashboard.admin_k3l');
+    })->name('dashboard.admin.k3l');
+
+    Route::get('/dashboard/admin/perencanaan-korporat', function () {
+        return view('dashboard.admin_perencanaan_korporat');
+    })->name('dashboard.admin.perencanaan_korporat');
+
+    Route::get('/dashboard/admin/sekretaris-perusahaan', function () {
+        return view('dashboard.admin_sekretaris');
+    })->name('dashboard.admin.sekretaris_perusahaan');
+
+    Route::get('/dashboard/admin/hukum', function () {
+        // Menampilkan dashboard hukum khusus
+        $user = Auth::user();
+        $tahun = request('tahun', date('Y'));
+        $bulan = request('bulan', date('m'));
+        $periodeTipe = request('periode_tipe', 'bulanan');
+
+        // Dapatkan bidang hukum
+        $bidang = Bidang::where('role_pic', 'pic_hukum')->first();
+
+        if (!$bidang) {
+            return redirect()->route('dashboard')->with('error', 'Bidang tidak ditemukan untuk PIC ini.');
+        }
+
+        // Dapatkan indikator untuk bidang hukum
+        $indikators = Indikator::where('bidang_id', $bidang->id)
+            ->where('aktif', true)
+            ->orderBy('kode')
+            ->get();
+
+        // Dapatkan nilai KPI untuk indikator-indikator tersebut
+        foreach ($indikators as $indikator) {
+            $nilaiKPI = NilaiKPI::where('indikator_id', $indikator->id)
+                ->where('tahun', $tahun)
+                ->where('bulan', $bulan)
+                ->where('periode_tipe', $periodeTipe)
+                ->first();
+
+            $indikator->nilai_persentase = $nilaiKPI ? $nilaiKPI->persentase : 0;
+            $indikator->nilai_absolut = $nilaiKPI ? $nilaiKPI->nilai : 0;
+            $indikator->diverifikasi = $nilaiKPI ? $nilaiKPI->diverifikasi : false;
+        }
+
+        // Hitung rata-rata nilai KPI untuk bidang ini
+        $totalNilai = 0;
+        foreach ($indikators as $indikator) {
+            $totalNilai += $indikator->nilai_persentase;
+        }
+
+        $rataRata = $indikators->count() > 0 ? round($totalNilai / $indikators->count(), 2) : 0;
+
+        // Tampilkan view khusus admin_hukum
+        return view('dashboard.admin_hukum', compact('bidang', 'indikators', 'rataRata', 'tahun', 'bulan'));
+    })->name('dashboard.admin.hukum');
 
