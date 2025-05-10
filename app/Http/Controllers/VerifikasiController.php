@@ -8,6 +8,7 @@ use App\Models\NilaiKPI;
 use App\Models\Bidang;
 use App\Models\Notifikasi;
 use App\Models\AktivitasLog;
+use App\Models\TahunPenilaian;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -18,7 +19,13 @@ class VerifikasiController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('role:asisten_manager');
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            if (Auth::user()->role !== 'asisten_manager') {
+                return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke fitur ini.');
+            }
+            return $next($request);
+        });
     }
 
     /**
@@ -45,7 +52,14 @@ class VerifikasiController extends Controller
         $nilaiKPIs = $query->paginate(20);
         $bidangs = Bidang::orderBy('nama')->get();
 
-        return view('verifikasi.index', compact('nilaiKPIs', 'bidangs', 'tahun', 'bulan', 'bidangId'));
+        // Cek apakah periode ini terkunci
+        $tahunPenilaian = TahunPenilaian::where('tahun', $tahun)
+            ->where('is_aktif', true)
+            ->first();
+
+        $isPeriodeLocked = $tahunPenilaian ? $tahunPenilaian->is_locked : false;
+
+        return view('verifikasi.index', compact('nilaiKPIs', 'bidangs', 'tahun', 'bulan', 'bidangId', 'isPeriodeLocked'));
     }
 
     /**
@@ -56,7 +70,14 @@ class VerifikasiController extends Controller
         $nilaiKPI = NilaiKPI::with(['indikator.bidang', 'indikator.pilar', 'user'])
             ->findOrFail($id);
 
-        return view('verifikasi.show', compact('nilaiKPI'));
+        // Cek apakah periode ini terkunci
+        $tahunPenilaian = TahunPenilaian::where('tahun', $nilaiKPI->tahun)
+            ->where('is_aktif', true)
+            ->first();
+
+        $isPeriodeLocked = $tahunPenilaian ? $tahunPenilaian->is_locked : false;
+
+        return view('verifikasi.show', compact('nilaiKPI', 'isPeriodeLocked'));
     }
 
     /**
@@ -70,6 +91,16 @@ class VerifikasiController extends Controller
         // Jika sudah diverifikasi, tidak perlu diproses lagi
         if ($nilaiKPI->diverifikasi) {
             return redirect()->route('verifikasi.index')->with('info', 'Nilai KPI ini sudah diverifikasi sebelumnya.');
+        }
+
+        // Cek apakah periode ini terkunci
+        $tahunPenilaian = TahunPenilaian::where('tahun', $nilaiKPI->tahun)
+            ->where('is_aktif', true)
+            ->first();
+
+        if ($tahunPenilaian && $tahunPenilaian->is_locked) {
+            return redirect()->route('verifikasi.index')
+                ->with('error', 'Periode penilaian tahun ' . $nilaiKPI->tahun . ' telah dikunci. Verifikasi tidak dapat dilakukan.');
         }
 
         // Verifikasi nilai KPI
@@ -118,6 +149,16 @@ class VerifikasiController extends Controller
         $request->validate([
             'alasan_penolakan' => 'required|string',
         ]);
+
+        // Cek apakah periode ini terkunci
+        $tahunPenilaian = TahunPenilaian::where('tahun', $nilaiKPI->tahun)
+            ->where('is_aktif', true)
+            ->first();
+
+        if ($tahunPenilaian && $tahunPenilaian->is_locked) {
+            return redirect()->route('verifikasi.index')
+                ->with('error', 'Periode penilaian tahun ' . $nilaiKPI->tahun . ' telah dikunci. Penolakan tidak dapat dilakukan.');
+        }
 
         // Catat informasi indikator sebelum dihapus
         $indikatorId = $nilaiKPI->indikator_id;
@@ -172,6 +213,19 @@ class VerifikasiController extends Controller
 
         $user = Auth::user();
         $nilaiKPIs = NilaiKPI::with('indikator')->whereIn('id', $request->nilai_ids)->get();
+
+        // Cek apakah ada nilai KPI dari periode yang terkunci
+        $tahunList = $nilaiKPIs->pluck('tahun')->unique();
+        $lockedPeriods = TahunPenilaian::whereIn('tahun', $tahunList)
+            ->where('is_locked', true)
+            ->get();
+
+        if ($lockedPeriods->count() > 0) {
+            $lockedYears = $lockedPeriods->pluck('tahun')->implode(', ');
+            return redirect()->route('verifikasi.index')
+                ->with('error', 'Periode penilaian tahun ' . $lockedYears . ' telah dikunci. Verifikasi massal tidak dapat dilakukan.');
+        }
+
         $count = 0;
 
         foreach ($nilaiKPIs as $nilaiKPI) {
@@ -212,6 +266,7 @@ class VerifikasiController extends Controller
             $count++;
         }
 
-        return redirect()->route('verifikasi.index')->with('success', $count . ' nilai KPI berhasil diverifikasi.');
+        return redirect()->route('verifikasi.index')
+            ->with('success', 'Berhasil memverifikasi ' . $count . ' nilai KPI.');
     }
 }

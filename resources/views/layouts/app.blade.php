@@ -607,6 +607,18 @@ use Illuminate\Support\Str;
           </a>
         </li>
         <li>
+          <a href="{{ route('dataKinerja.index') }}" class="{{ request()->routeIs('dataKinerja.*') ? 'active' : '' }}">
+            <i class="fas fa-chart-bar icon"></i>
+            <span class="menu-text">Data Kinerja</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('targetKinerja.index') }}" class="{{ request()->routeIs('targetKinerja.*') ? 'active' : '' }}">
+            <i class="fas fa-bullseye icon"></i>
+            <span class="menu-text">Target Kinerja</span>
+          </a>
+        </li>
+        <li>
           <a href="{{ route('eksporPdf.index') }}" class="{{ request()->routeIs('eksporPdf.*') ? 'active' : '' }}">
             <i class="fas fa-file-pdf icon"></i>
             <span class="menu-text">Ekspor PDF</span>
@@ -626,6 +638,12 @@ use Illuminate\Support\Str;
           <a href="{{ route('dataKinerja.index') }}" class="{{ request()->routeIs('dataKinerja.*') ? 'active' : '' }}">
             <i class="fas fa-chart-bar icon"></i>
             <span class="menu-text">Data Kinerja</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ route('targetKinerja.index') }}" class="{{ request()->routeIs('targetKinerja.*') ? 'active' : '' }}">
+            <i class="fas fa-bullseye icon"></i>
+            <span class="menu-text">Target Kinerja</span>
           </a>
         </li>
         <li>

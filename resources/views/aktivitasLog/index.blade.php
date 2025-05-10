@@ -89,7 +89,7 @@
                                                 {{ ucfirst($log->tipe) }}
                                             </span>
                                         </td>
-                                        <td>{{ $log->deskripsi }}</td>
+                                        <td>{{ $log->pesan }}</td>
                                         <td>{{ $log->ip_address }}</td>
                                         <td>{{ $log->created_at->format('d-m-Y H:i:s') }}</td>
                                         <td>

@@ -7,6 +7,7 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\VerifikasiController;
 use App\Http\Controllers\TahunPenilaianController;
 use App\Http\Controllers\DataKinerjaController;
+use App\Http\Controllers\TargetKinerjaController;
 use App\Http\Controllers\EksporPdfController;
 use App\Http\Controllers\RealisasiController;
 use App\Http\Controllers\KPIController;
@@ -139,7 +140,25 @@ use App\Models\NilaiKPI;
         Route::resource('verifikasi', VerifikasiController::class);
         Route::resource('tahunPenilaian', TahunPenilaianController::class);
         Route::get('/tahunPenilaian/{id}/activate', [TahunPenilaianController::class, 'activate'])->name('tahunPenilaian.activate');
-        Route::resource('dataKinerja', DataKinerjaController::class);
+        Route::get('/tahunPenilaian/{id}/lock', [TahunPenilaianController::class, 'lock'])->name('tahunPenilaian.lock');
+        Route::get('/tahunPenilaian/{id}/unlock', [TahunPenilaianController::class, 'unlock'])->name('tahunPenilaian.unlock');
+
+        // Routes untuk Data Kinerja
+        Route::get('/dataKinerja', [DataKinerjaController::class, 'index'])->name('dataKinerja.index');
+        Route::get('/dataKinerja/pilar/{id?}', [DataKinerjaController::class, 'pilar'])->name('dataKinerja.pilar');
+        Route::get('/dataKinerja/bidang/{id?}', [DataKinerjaController::class, 'bidang'])->name('dataKinerja.bidang');
+        Route::get('/dataKinerja/indikator/{id}', [DataKinerjaController::class, 'indikator'])->name('dataKinerja.indikator');
+        Route::get('/dataKinerja/perbandingan', [DataKinerjaController::class, 'perbandingan'])->name('dataKinerja.perbandingan');
+
+        // Routes untuk Target Kinerja
+        Route::get('/targetKinerja', [TargetKinerjaController::class, 'index'])->name('targetKinerja.index');
+        Route::get('/targetKinerja/create', [TargetKinerjaController::class, 'create'])->name('targetKinerja.create');
+        Route::post('/targetKinerja', [TargetKinerjaController::class, 'store'])->name('targetKinerja.store');
+        Route::get('/targetKinerja/{targetKinerja}/edit', [TargetKinerjaController::class, 'edit'])->name('targetKinerja.edit');
+        Route::put('/targetKinerja/{targetKinerja}', [TargetKinerjaController::class, 'update'])->name('targetKinerja.update');
+        Route::get('/targetKinerja/{targetKinerja}/approve', [TargetKinerjaController::class, 'approve'])->name('targetKinerja.approve');
+        Route::get('/targetKinerja/{targetKinerja}/unapprove', [TargetKinerjaController::class, 'unapprove'])->name('targetKinerja.unapprove');
+
         Route::resource('realisasi', RealisasiController::class);
 
         // Ekspor PDF
@@ -181,6 +200,8 @@ use App\Models\NilaiKPI;
             // Tahun Penilaian
             Route::resource('tahunPenilaian', TahunPenilaianController::class);
             Route::get('/tahunPenilaian/{id}/activate', [TahunPenilaianController::class, 'activate'])->name('tahunPenilaian.activate');
+            Route::get('/tahunPenilaian/{id}/lock', [TahunPenilaianController::class, 'lock'])->name('tahunPenilaian.lock');
+            Route::get('/tahunPenilaian/{id}/unlock', [TahunPenilaianController::class, 'unlock'])->name('tahunPenilaian.unlock');
 
             // Ekspor PDF
             Route::get('/ekspor-pdf', [EksporPdfController::class, 'index'])->name('eksporPdf.index');

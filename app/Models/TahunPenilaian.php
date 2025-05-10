@@ -24,7 +24,11 @@ class TahunPenilaian extends Model
     protected $fillable = [
         'tahun',
         'deskripsi',
+        'tipe_periode',
+        'tanggal_mulai',
+        'tanggal_selesai',
         'is_aktif',
+        'is_locked',
         'dibuat_oleh',
         'diupdate_oleh',
     ];
@@ -36,6 +40,9 @@ class TahunPenilaian extends Model
      */
     protected $casts = [
         'is_aktif' => 'boolean',
+        'is_locked' => 'boolean',
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date',
     ];
 
     /**
@@ -73,5 +80,32 @@ class TahunPenilaian extends Model
     {
         $active = self::getActive();
         return $active ? $active->tahun : date('Y');
+    }
+
+    /**
+     * Cek apakah periode sudah terkunci (locked)
+     *
+     * @return bool
+     */
+    public function isLocked()
+    {
+        return $this->is_locked;
+    }
+
+    /**
+     * Mendapatkan label untuk tipe periode
+     *
+     * @return string
+     */
+    public function getTipePeriodeLabel()
+    {
+        $labels = [
+            'tahunan' => 'Tahunan',
+            'semesteran' => 'Semesteran',
+            'triwulanan' => 'Triwulanan',
+            'bulanan' => 'Bulanan',
+        ];
+
+        return $labels[$this->tipe_periode] ?? 'Tahunan';
     }
 }

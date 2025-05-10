@@ -16,7 +16,13 @@ class AktivitasLogController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('role:asisten_manager');
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            if (Auth::user()->role !== 'asisten_manager') {
+                return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke fitur ini.');
+            }
+            return $next($request);
+        });
     }
 
     /**

@@ -45,6 +45,14 @@ class Indikator extends Model
     }
 
     /**
+     * Mendapatkan semua target KPI untuk indikator ini
+     */
+    public function targetKPIs(): HasMany
+    {
+        return $this->hasMany(TargetKPI::class);
+    }
+
+    /**
      * Mendapatkan nilai KPI untuk periode tertentu
      *
      * @param int $tahun
@@ -61,6 +69,19 @@ class Indikator extends Model
             ->first();
 
         return $nilaiKPI ? $nilaiKPI->persentase : 0;
+    }
+
+    /**
+     * Mendapatkan target KPI untuk tahun penilaian tertentu
+     *
+     * @param int $tahunPenilaianId
+     * @return TargetKPI|null
+     */
+    public function getTarget(int $tahunPenilaianId)
+    {
+        return $this->targetKPIs()
+            ->where('tahun_penilaian_id', $tahunPenilaianId)
+            ->first();
     }
 
     /**

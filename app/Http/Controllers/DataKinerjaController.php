@@ -27,6 +27,7 @@ class DataKinerjaController extends Controller
     public function index(Request $request)
     {
         $tahun = $request->tahun ?? Carbon::now()->year;
+        $bulan = $request->bulan ?? Carbon::now()->month;
         $user = Auth::user();
 
         // Ambil data untuk ringkasan KPI
@@ -53,8 +54,15 @@ class DataKinerjaController extends Controller
             'perkembangan' => $this->getPerkembanganBulanan($tahun),
         ];
 
+        // Data untuk chart tambahan
+        $indikatorComposition = $this->getIndikatorComposition($tahun);
+        $statusMapping = $this->getStatusMapping($tahun);
+        $historicalTrend = $this->getHistoricalTrend();
+        $forecastData = $this->getForecastData($tahun);
+
         return view('dataKinerja.index', compact(
             'tahun',
+            'bulan',
             'totalIndikator',
             'totalIndikatorTercapai',
             'persenTercapai',
@@ -62,7 +70,11 @@ class DataKinerjaController extends Controller
             'trendNKO',
             'pilarData',
             'bidangData',
-            'analisisData'
+            'analisisData',
+            'indikatorComposition',
+            'statusMapping',
+            'historicalTrend',
+            'forecastData'
         ));
     }
 
@@ -486,5 +498,187 @@ class DataKinerjaController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * Mendapatkan komposisi indikator (tercapai, belum tercapai)
+     */
+    private function getIndikatorComposition($tahun)
+    {
+        $indikators = Indikator::where('aktif', true)->get();
+        $tercapai = 0;
+        $belumTercapai = 0;
+        $kritisPerluPerhatian = 0;
+
+        foreach ($indikators as $indikator) {
+            $nilaiRata = 0;
+            $count = 0;
+
+            for ($bulan = 1; $bulan <= 12; $bulan++) {
+                $nilai = NilaiKPI::where('indikator_id', $indikator->id)
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $bulan)
+                    ->where('periode_tipe', 'bulanan')
+                    ->first();
+
+                if ($nilai) {
+                    $nilaiRata += $nilai->persentase;
+                    $count++;
+                }
+            }
+
+            if ($count > 0) {
+                $nilaiRata = $nilaiRata / $count;
+
+                if ($nilaiRata >= 85) {
+                    $tercapai++;
+                } elseif ($nilaiRata >= 70) {
+                    $kritisPerluPerhatian++;
+                } else {
+                    $belumTercapai++;
+                }
+            } else {
+                $belumTercapai++;
+            }
+        }
+
+        return [
+            ['status' => 'Tercapai', 'jumlah' => $tercapai],
+            ['status' => 'Perlu Perhatian', 'jumlah' => $kritisPerluPerhatian],
+            ['status' => 'Tidak Tercapai', 'jumlah' => $belumTercapai]
+        ];
+    }
+
+    /**
+     * Mendapatkan pemetaan status indikator
+     */
+    private function getStatusMapping($tahun)
+    {
+        $indikators = Indikator::where('aktif', true)->get();
+        $mapping = [
+            'sangat_baik' => 0,  // >= 90%
+            'baik' => 0,         // >= 80% & < 90%
+            'cukup' => 0,        // >= 70% & < 80%
+            'kurang' => 0,       // >= 60% & < 70%
+            'sangat_kurang' => 0 // < 60%
+        ];
+
+        foreach ($indikators as $indikator) {
+            $nilaiRata = 0;
+            $count = 0;
+
+            for ($bulan = 1; $bulan <= 12; $bulan++) {
+                $nilai = NilaiKPI::where('indikator_id', $indikator->id)
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $bulan)
+                    ->where('periode_tipe', 'bulanan')
+                    ->first();
+
+                if ($nilai) {
+                    $nilaiRata += $nilai->persentase;
+                    $count++;
+                }
+            }
+
+            if ($count > 0) {
+                $nilaiRata = $nilaiRata / $count;
+
+                if ($nilaiRata >= 90) {
+                    $mapping['sangat_baik']++;
+                } elseif ($nilaiRata >= 80) {
+                    $mapping['baik']++;
+                } elseif ($nilaiRata >= 70) {
+                    $mapping['cukup']++;
+                } elseif ($nilaiRata >= 60) {
+                    $mapping['kurang']++;
+                } else {
+                    $mapping['sangat_kurang']++;
+                }
+            } else {
+                $mapping['sangat_kurang']++;
+            }
+        }
+
+        return [
+            ['status' => 'Sangat Baik', 'jumlah' => $mapping['sangat_baik'], 'color' => '#1cc88a'],
+            ['status' => 'Baik', 'jumlah' => $mapping['baik'], 'color' => '#36b9cc'],
+            ['status' => 'Cukup', 'jumlah' => $mapping['cukup'], 'color' => '#f6c23e'],
+            ['status' => 'Kurang', 'jumlah' => $mapping['kurang'], 'color' => '#e74a3b'],
+            ['status' => 'Sangat Kurang', 'jumlah' => $mapping['sangat_kurang'], 'color' => '#858796']
+        ];
+    }
+
+    /**
+     * Mendapatkan tren historis tahunan
+     */
+    private function getHistoricalTrend()
+    {
+        $trendData = [];
+        $currentYear = Carbon::now()->year;
+
+        // Ambil data untuk 5 tahun terakhir
+        for ($year = $currentYear - 4; $year <= $currentYear; $year++) {
+            $nko = $this->hitungNKO($year, null);
+            $trendData[] = [
+                'tahun' => $year,
+                'nilai' => $nko
+            ];
+        }
+
+        return $trendData;
+    }
+
+    /**
+     * Mendapatkan data forecast untuk 6 bulan ke depan
+     */
+    private function getForecastData($tahun)
+    {
+        $bulanSekarang = Carbon::now()->month;
+        $tahunSekarang = Carbon::now()->year;
+        $forecastData = [];
+
+        // Data historikal untuk bulan-bulan sebelumnya tahun ini
+        for ($bulan = 1; $bulan <= $bulanSekarang; $bulan++) {
+            $nko = $this->hitungNKO($tahunSekarang, $bulan);
+            $forecastData[] = [
+                'bulan' => Carbon::create(null, $bulan, 1)->locale('id')->monthName,
+                'nilai' => $nko,
+                'tipe' => 'Aktual'
+            ];
+        }
+
+        // Forecast untuk bulan selanjutnya hingga akhir tahun
+        // Menggunakan simple moving average untuk prediksi
+        $rataRata = 0;
+        $jumlahData = 0;
+
+        for ($bulan = 1; $bulan <= $bulanSekarang; $bulan++) {
+            $nko = $this->hitungNKO($tahunSekarang, $bulan);
+            if ($nko > 0) {
+                $rataRata += $nko;
+                $jumlahData++;
+            }
+        }
+
+        if ($jumlahData > 0) {
+            $rataRata = $rataRata / $jumlahData;
+
+            // Gunakan trend sederhana (naik 1.5% per bulan)
+            $trendKenaikan = 1.5;
+
+            for ($bulan = $bulanSekarang + 1; $bulan <= 12; $bulan++) {
+                $forecastNilai = $rataRata + ($trendKenaikan * ($bulan - $bulanSekarang));
+                // Pastikan nilai forecast tidak melebihi 100%
+                $forecastNilai = min($forecastNilai, 100);
+
+                $forecastData[] = [
+                    'bulan' => Carbon::create(null, $bulan, 1)->locale('id')->monthName,
+                    'nilai' => $forecastNilai,
+                    'tipe' => 'Forecast'
+                ];
+            }
+        }
+
+        return $forecastData;
     }
 }
