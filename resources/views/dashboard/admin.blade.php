@@ -424,395 +424,600 @@
       grid-template-columns: 1fr;
     }
   }
+
+  /* Tambahan gaya untuk komponen terintegrasi */
+  .missing-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .missing-item {
+    display: flex;
+    align-items: center;
+    background: var(--pln-surface);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .missing-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .missing-kode {
+    background: var(--pln-light-blue);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-right: 12px;
+    font-size: 14px;
+  }
+
+  .missing-content {
+    flex: 1;
+  }
+
+  .missing-title {
+    font-size: 16px;
+    margin: 0 0 5px;
+    color: var(--pln-text);
+    font-weight: 600;
+  }
+
+  .missing-target {
+    font-size: 14px;
+    color: var(--pln-text-secondary);
+    margin: 0;
+  }
+
+  .missing-action {
+    margin-left: 10px;
+  }
+
+  /* Notification styles */
+  .notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    display: flex;
+    background: var(--pln-surface);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: white;
+  }
+
+  .bg-info {
+    background: var(--pln-light-blue);
+  }
+
+  .bg-success {
+    background: #4CAF50;
+  }
+
+  .bg-warning {
+    background: #FFC107;
+  }
+
+  .bg-danger {
+    background: #F44336;
+  }
+
+  .notification-content {
+    flex: 1;
+  }
+
+  .notification-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 5px;
+    color: var(--pln-text);
+  }
+
+  .notification-message {
+    font-size: 14px;
+    color: var(--pln-text-secondary);
+    margin: 0 0 5px;
+  }
+
+  .notification-time {
+    font-size: 12px;
+    color: var(--pln-text-secondary);
+    font-style: italic;
+  }
+
+  /* Activity styles */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .activity-item {
+    display: flex;
+    background: var(--pln-surface);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .activity-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    background: var(--pln-light-blue);
+    color: white;
+  }
+
+  .activity-content {
+    flex: 1;
+  }
+
+  .activity-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--pln-text);
+  }
+
+  .activity-details {
+    font-size: 12px;
+    color: var(--pln-text-secondary);
+  }
+
+  .activity-user {
+    font-weight: 600;
+    margin-right: 10px;
+  }
+
+  .activity-time {
+    font-style: italic;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    color: var(--pln-text-secondary);
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+    opacity: 0.6;
+  }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .status-verified {
+    background-color: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+  }
+
+  .status-pending {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #FFC107;
+  }
+
+  /* Button styles */
+  .btn-action {
+    background: var(--pln-light-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-action:hover {
+    background: var(--pln-blue);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .btn-action.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .btn-secondary {
+    background: var(--pln-surface);
+    color: var(--pln-text);
+    border: 1px solid var(--pln-border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    background: var(--pln-hover);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
 </style>
 @endsection
 
 @section('content')
 <div class="dashboard-content">
-  <!-- Stat Cards -->
-  <div class="dashboard-row">
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Rata-rata Nilai</h3>
-          <div class="stat-icon">
-            <i class="fas fa-chart-line"></i>
-          </div>
+    <!-- Filter dan Periode -->
+    <div class="filter-row row mb-4">
+        <div class="col-md-8">
+            <form action="{{ route('dashboard') }}" method="GET" class="d-flex">
+                <div class="form-group mr-3">
+                    <label for="tahun">Tahun</label>
+                    <select class="form-control" id="tahun" name="tahun" onchange="this.form.submit()">
+                        @for ($i = date('Y'); $i >= 2020; $i--)
+                            <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="form-group mr-3">
+                    <label for="bulan">Bulan</label>
+                    <select class="form-control" id="bulan" name="bulan" onchange="this.form.submit()">
+                        @php
+                            $namaBulan = [
+                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                            ];
+                        @endphp
+                        @foreach ($namaBulan as $key => $nama)
+                            <option value="{{ $key }}" {{ $bulan == $key ? 'selected' : '' }}>{{ $nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="periode_tipe">Periode</label>
+                    <select class="form-control" id="periode_tipe" name="periode_tipe" onchange="this.form.submit()">
+                        <option value="bulanan" {{ $periodeTipe == 'bulanan' ? 'selected' : '' }}>Bulanan</option>
+                        <option value="mingguan" {{ $periodeTipe == 'mingguan' ? 'selected' : '' }}>Mingguan</option>
+                    </select>
+                </div>
+            </form>
         </div>
-        <div class="stat-value">{{ $rataRata }}</div>
-        <p class="stat-description">Kinerja Rata-rata Bidang</p>
-      </div>
-    </div>
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Target</h3>
-          <div class="stat-icon">
-            <i class="fas fa-bullseye"></i>
-          </div>
-        </div>
-        <div class="stat-value">100</div>
-        <p class="stat-description">Target Pencapaian</p>
-      </div>
-    </div>
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Indikator</h3>
-          <div class="stat-icon">
-            <i class="fas fa-tasks"></i>
-          </div>
-        </div>
-        <div class="stat-value">{{ count($indikators) }}</div>
-        <p class="stat-description">Jumlah Indikator</p>
-      </div>
-    </div>
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Progress</h3>
-          <div class="stat-icon">
-            <i class="fas fa-spinner"></i>
-          </div>
-        </div>
-        <div class="stat-value">{{ $rataRata }}%</div>
-        <p class="stat-description">Persentase Pencapaian</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Widget Grid: Gauge & History Charts Side by Side -->
-  <div class="widget-grid">
-    <!-- Performance Gauge -->
-    <div class="chart-container">
-      <h3 class="chart-title">
-        <i class="fas fa-tachometer-alt mr-2"></i>
-        Kinerja {{ $bidang->nama }}
-      </h3>
-      <div class="meter-container">
-        <canvas id="gaugeChart" height="180"></canvas>
-        <div class="nko-label">Kinerja</div>
-        <div class="nko-value">{{ $rataRata }}</div>
-      </div>
     </div>
 
-    <!-- Histori Chart -->
-    <div class="chart-container">
-      <h3 class="chart-title">
-        <i class="fas fa-chart-line mr-2"></i>
-        Histori Kinerja {{ $bidang->nama }} {{ $tahun }}
-      </h3>
-      <canvas id="historiChart" height="180"></canvas>
+    <!-- Row 1: Statistik Ringkasan -->
+    <div class="dashboard-row">
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Nilai Rata-rata</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <h3 class="stat-value">{{ $rataRata }}%</h3>
+                <p class="stat-description">Rata-rata nilai KPI {{ $bidang->nama }}</p>
+            </div>
+        </div>
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Total Indikator</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                </div>
+                <h3 class="stat-value">{{ $indikators->count() }}</h3>
+                <p class="stat-description">Total indikator aktif di bidang ini</p>
+            </div>
+        </div>
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">KPI Belum Diinput</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <h3 class="stat-value">{{ $missingInputs->count() }}</h3>
+                <p class="stat-description">KPI yang belum diinput bulan ini</p>
+            </div>
+        </div>
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Posisi Bidang</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                </div>
+                @php
+                    $position = array_search($bidang->nama, array_column($bidangComparison, 'nama')) !== false
+                        ? array_search($bidang->nama, array_column($bidangComparison, 'nama')) + 1
+                        : count($bidangComparison) + 1;
+                    $totalBidang = count($bidangComparison) + 1;
+                @endphp
+                <h3 class="stat-value">#{{ $position }}</h3>
+                <p class="stat-description">Dari {{ $totalBidang }} bidang</p>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Indikator Cards dengan Tab dan Pagination -->
-  <div class="chart-container mt-4">
-    <h3 class="chart-title">
-      <i class="fas fa-list-ul mr-2"></i>
-      Daftar Indikator {{ $bidang->nama }}
-    </h3>
-
-    <!-- Tabs untuk filter status -->
-    <ul class="nav nav-tabs" id="indikatorTabs" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" id="semua-tab" data-toggle="tab" href="#semua" role="tab">
-          Semua <span class="badge badge-pill badge-secondary ml-1">{{ count($indikators) }}</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="terverifikasi-tab" data-toggle="tab" href="#terverifikasi" role="tab">
-          Terverifikasi <span class="badge badge-pill badge-success ml-1">{{ $indikators->where('diverifikasi', true)->count() }}</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="belum-terverifikasi-tab" data-toggle="tab" href="#belum-terverifikasi" role="tab">
-          Belum Terverifikasi <span class="badge badge-pill badge-warning ml-1">{{ $indikators->where('diverifikasi', false)->count() }}</span>
-        </a>
-      </li>
-    </ul>
-
-    <div class="tab-content" id="indikatorTabsContent">
-      <!-- Tab Semua Indikator -->
-      <div class="tab-pane fade show active" id="semua" role="tabpanel">
-        <div class="indikator-grid">
-          @foreach($indikators->take(6) as $indikator)
-          <div class="indikator-card">
-            <div class="indikator-header">
-              <h3 class="indikator-title">{{ $indikator->nama }}</h3>
-              <span class="indikator-code">{{ $indikator->kode }}</span>
+    <!-- Row 2: Grafik dan KPI yang belum diinput -->
+    <div class="row mt-4">
+        <div class="col-md-7">
+            <div class="dashboard-card">
+                <h2 class="card-title">Trend Kinerja {{ $tahun }}</h2>
+                <div class="chart-container mt-3">
+                    <canvas id="historyChart" height="200"></canvas>
+                </div>
             </div>
-            <div class="indikator-value">{{ $indikator->nilai_persentase }}%</div>
-            <div class="indikator-target">
-              <strong>Target:</strong> {{ $indikator->target }} {{ $indikator->satuan }}
-              <span class="ml-3"><strong>Realisasi:</strong> {{ $indikator->nilai_absolut }} {{ $indikator->satuan }}</span>
-            </div>
-
-            @php
-              $progressClass = 'progress-red';
-              if ($indikator->nilai_persentase >= 70) {
-                $progressClass = 'progress-green';
-              } elseif ($indikator->nilai_persentase >= 50) {
-                $progressClass = 'progress-yellow';
-              }
-            @endphp
-            <div class="progress">
-              <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $indikator->nilai_persentase }}%"></div>
-            </div>
-
-            <div>
-              @if($indikator->diverifikasi)
-                <span class="indikator-status status-verified">
-                  <i class="fas fa-check-circle mr-1"></i> Terverifikasi
-                </span>
-              @else
-                <span class="indikator-status status-unverified">
-                  <i class="fas fa-clock mr-1"></i> Belum Diverifikasi
-                </span>
-              @endif
-
-              <a href="{{ route('realisasi.create', ['indikator_id' => $indikator->id, 'tahun' => $tahun, 'bulan' => $bulan]) }}" class="btn btn-sm btn-primary float-right">
-                <i class="fas fa-edit"></i> Input
-              </a>
-            </div>
-          </div>
-          @endforeach
         </div>
+        <div class="col-md-5">
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <i class="fas fa-clipboard-list mr-2"></i>
+                    KPI Yang Belum Diinput
+                </h2>
 
-        @if(count($indikators) > 6)
-        <div class="pagination-container">
-          <ul class="pagination">
-            <li><a href="#" class="active">1</a></li>
-            <li><a href="#">2</a></li>
-            @if(count($indikators) > 12)
-            <li><a href="#">3</a></li>
-            @endif
-            <li><a href="#"><i class="fas fa-chevron-right"></i></a></li>
-          </ul>
+                @if($missingInputs->count() > 0)
+                    <div class="missing-list">
+                        @foreach($missingInputs as $missing)
+                            <div class="missing-item">
+                                <div class="missing-kode">{{ $missing->kode }}</div>
+                                <div class="missing-content">
+                                    <h4 class="missing-title">{{ $missing->nama }}</h4>
+                                    <p class="missing-target">Target: {{ $missing->target }}</p>
+                                </div>
+                                <div class="missing-action">
+                                    <a href="{{ route('realisasi.create', ['indikator_id' => $missing->id, 'tahun' => $tahun, 'bulan' => $bulan, 'periode_tipe' => $periodeTipe]) }}" class="btn btn-action btn-sm">
+                                        <i class="fas fa-plus"></i> Input
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle empty-icon"></i>
+                        <p>Semua KPI sudah diinput untuk periode ini</p>
+                    </div>
+                @endif
+            </div>
         </div>
-        @endif
-      </div>
-
-      <!-- Tab Terverifikasi -->
-      <div class="tab-pane fade" id="terverifikasi" role="tabpanel">
-        <div class="indikator-grid">
-          @foreach($indikators->where('diverifikasi', true)->take(6) as $indikator)
-          <div class="indikator-card">
-            <div class="indikator-header">
-              <h3 class="indikator-title">{{ $indikator->nama }}</h3>
-              <span class="indikator-code">{{ $indikator->kode }}</span>
-            </div>
-            <div class="indikator-value">{{ $indikator->nilai_persentase }}%</div>
-            <div class="indikator-target">
-              <strong>Target:</strong> {{ $indikator->target }} {{ $indikator->satuan }}
-              <span class="ml-3"><strong>Realisasi:</strong> {{ $indikator->nilai_absolut }} {{ $indikator->satuan }}</span>
-            </div>
-
-            @php
-              $progressClass = 'progress-red';
-              if ($indikator->nilai_persentase >= 70) {
-                $progressClass = 'progress-green';
-              } elseif ($indikator->nilai_persentase >= 50) {
-                $progressClass = 'progress-yellow';
-              }
-            @endphp
-            <div class="progress">
-              <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $indikator->nilai_persentase }}%"></div>
-            </div>
-
-            <div>
-              <span class="indikator-status status-verified">
-                <i class="fas fa-check-circle mr-1"></i> Terverifikasi
-              </span>
-
-              <a href="{{ route('realisasi.create', ['indikator_id' => $indikator->id, 'tahun' => $tahun, 'bulan' => $bulan]) }}" class="btn btn-sm btn-primary float-right">
-                <i class="fas fa-edit"></i> Input
-              </a>
-            </div>
-          </div>
-          @endforeach
-        </div>
-
-        @if($indikators->where('diverifikasi', true)->count() > 6)
-        <div class="pagination-container">
-          <ul class="pagination">
-            <li><a href="#" class="active">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#"><i class="fas fa-chevron-right"></i></a></li>
-          </ul>
-        </div>
-        @endif
-      </div>
-
-      <!-- Tab Belum Terverifikasi -->
-      <div class="tab-pane fade" id="belum-terverifikasi" role="tabpanel">
-        <div class="indikator-grid">
-          @foreach($indikators->where('diverifikasi', false)->take(6) as $indikator)
-          <div class="indikator-card">
-            <div class="indikator-header">
-              <h3 class="indikator-title">{{ $indikator->nama }}</h3>
-              <span class="indikator-code">{{ $indikator->kode }}</span>
-            </div>
-            <div class="indikator-value">{{ $indikator->nilai_persentase }}%</div>
-            <div class="indikator-target">
-              <strong>Target:</strong> {{ $indikator->target }} {{ $indikator->satuan }}
-              <span class="ml-3"><strong>Realisasi:</strong> {{ $indikator->nilai_absolut }} {{ $indikator->satuan }}</span>
-            </div>
-
-            @php
-              $progressClass = 'progress-red';
-              if ($indikator->nilai_persentase >= 70) {
-                $progressClass = 'progress-green';
-              } elseif ($indikator->nilai_persentase >= 50) {
-                $progressClass = 'progress-yellow';
-              }
-            @endphp
-            <div class="progress">
-              <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $indikator->nilai_persentase }}%"></div>
-            </div>
-
-            <div>
-              <span class="indikator-status status-unverified">
-                <i class="fas fa-clock mr-1"></i> Belum Diverifikasi
-              </span>
-
-              <a href="{{ route('realisasi.create', ['indikator_id' => $indikator->id, 'tahun' => $tahun, 'bulan' => $bulan]) }}" class="btn btn-sm btn-primary float-right">
-                <i class="fas fa-edit"></i> Input
-              </a>
-            </div>
-          </div>
-          @endforeach
-        </div>
-
-        @if($indikators->where('diverifikasi', false)->count() > 6)
-        <div class="pagination-container">
-          <ul class="pagination">
-            <li><a href="#" class="active">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#"><i class="fas fa-chevron-right"></i></a></li>
-          </ul>
-        </div>
-        @endif
-      </div>
     </div>
-  </div>
+
+    <!-- Row 3: Notifikasi dan Log Aktivitas -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <i class="fas fa-bell mr-2"></i>
+                    Notifikasi Terbaru
+                </h2>
+
+                @if($latestNotifications->count() > 0)
+                    <div class="notification-list">
+                        @foreach($latestNotifications as $notification)
+                            <div class="notification-item">
+                                <div class="notification-icon bg-{{ $notification->jenis }}">
+                                    <i class="fas fa-{{ $notification->jenis == 'info' ? 'info-circle' : ($notification->jenis == 'success' ? 'check-circle' : 'exclamation-circle') }}"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h4 class="notification-title">{{ $notification->judul }}</h4>
+                                    <p class="notification-message">{{ $notification->pesan }}</p>
+                                    <div class="notification-time">{{ $notification->created_at->diffForHumans() }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('notifikasi.index') }}" class="btn btn-action">Lihat Semua Notifikasi</a>
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash empty-icon"></i>
+                        <p>Tidak ada notifikasi baru</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <i class="fas fa-history mr-2"></i>
+                    Aktivitas Terbaru Bidang
+                </h2>
+
+                @if($latestActivities->count() > 0)
+                    <div class="activity-list">
+                        @foreach($latestActivities as $activity)
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-{{ $activity->tipe == 'create' ? 'plus-circle' : ($activity->tipe == 'update' ? 'edit' : 'trash-alt') }}"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">{{ $activity->judul }}</div>
+                                    <div class="activity-details">
+                                        <span class="activity-user">{{ $activity->user->name }}</span>
+                                        <span class="activity-time">{{ $activity->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('aktivitasLog.index') }}" class="btn btn-action">Lihat Semua Aktivitas</a>
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-clock empty-icon"></i>
+                        <p>Tidak ada aktivitas terbaru</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Tabel Indikator -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="dashboard-card">
+                <h2 class="card-title">Kinerja Indikator Bidang {{ $bidang->nama }}</h2>
+
+                <div class="indikator-grid">
+                    @foreach ($indikators as $indikator)
+                        <div class="indikator-card">
+                            <div class="indikator-header">
+                                <h3 class="indikator-title">{{ $indikator->nama }}</h3>
+                                <span class="indikator-code">{{ $indikator->kode }}</span>
+                            </div>
+
+                            <div class="indikator-value">{{ $indikator->nilai_persentase }}%</div>
+                            <div class="indikator-target">Target: {{ $indikator->target }} {{ $indikator->satuan }}</div>
+                            <div class="indikator-target">Realisasi: {{ $indikator->nilai_absolut }} {{ $indikator->satuan }}</div>
+
+                            <div class="progress">
+                                <div class="progress-bar {{ $indikator->nilai_persentase < 70 ? 'progress-red' : ($indikator->nilai_persentase < 90 ? 'progress-yellow' : 'progress-green') }}"
+                                    style="width: {{ $indikator->nilai_persentase }}%"></div>
+                            </div>
+
+                            <div class="indikator-status">
+                                @if($indikator->diverifikasi)
+                                    <span class="status-badge status-verified">
+                                        <i class="fas fa-check-circle"></i> Terverifikasi
+                                    </span>
+                                @else
+                                    <span class="status-badge status-pending">
+                                        <i class="fas fa-clock"></i> Belum Diverifikasi
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="indikator-actions">
+                                <a href="{{ route('realisasi.create', ['indikator_id' => $indikator->id, 'tahun' => $tahun, 'bulan' => $bulan, 'periode_tipe' => $periodeTipe]) }}" class="btn btn-action btn-sm mt-2">
+                                    <i class="fas fa-edit"></i> Update
+                                </a>
+                                <a href="{{ route('dataKinerja.indikator', $indikator->id) }}" class="btn btn-secondary btn-sm mt-2">
+                                    <i class="fas fa-chart-bar"></i> Histori
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Gauge Chart
-    const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
-    const rataRata = {{ $rataRata }};
+    document.addEventListener('DOMContentLoaded', function() {
+        // History Chart
+        const historyData = {
+            labels: [
+                @foreach($historiData as $data)
+                    '{{ $data['bulan'] }}',
+                @endforeach
+            ],
+            datasets: [{
+                label: 'Nilai KPI (%)',
+                data: [
+                    @foreach($historiData as $data)
+                        {{ $data['nilai'] }},
+                    @endforeach
+                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                tension: 0.3,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointRadius: 4
+            }]
+        };
 
-    // Determine color based on value
-    let gaugeColor = '#F44336'; // Red for low values
-    if (rataRata >= 70) {
-      gaugeColor = '#4CAF50'; // Green for high values
-    } else if (rataRata >= 50) {
-      gaugeColor = '#FFC107'; // Yellow for medium values
-    }
-
-    new Chart(gaugeCtx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [rataRata, 100 - rataRata],
-          backgroundColor: [
-            gaugeColor,
-            'rgba(200, 200, 200, 0.1)'
-          ],
-          borderWidth: 0,
-          circumference: 180,
-          rotation: 270,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        cutout: '70%',
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            enabled: false
-          }
-        },
-        animation: {
-          animateRotate: true,
-          animateScale: false,
-          duration: 1000
-        }
-      }
-    });
-
-    // History Chart
-    const historiCtx = document.getElementById('historiChart').getContext('2d');
-    const historiData = @json($historiData);
-
-    new Chart(historiCtx, {
-      type: 'line',
-      data: {
-        labels: historiData.map(d => d.bulan),
-        datasets: [{
-          label: 'Nilai Kinerja',
-          data: historiData.map(d => d.nilai),
-          backgroundColor: 'rgba(0, 156, 222, 0.2)',
-          borderColor: '#009cde',
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: 'var(--pln-text-secondary)'
+        const historyChart = new Chart(document.getElementById('historyChart'), {
+            type: 'line',
+            data: historyData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
             }
-          },
-          y: {
-            beginAtZero: true,
-            max: 100,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            },
-            ticks: {
-              color: 'var(--pln-text-secondary)',
-              callback: function(value) {
-                return value + '%';
-              }
-            }
-          }
-        },
-        animation: {
-          duration: 1000
-        }
-      }
+        });
     });
-
-    // Inisialisasi lazy loading untuk tab content
-    document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        // Allow DOM to update before calculating layouts
-        setTimeout(function() {
-          window.dispatchEvent(new Event('resize'));
-        }, 50);
-      });
-    });
-  });
 </script>
 @endsection

@@ -85,8 +85,81 @@ class DashboardController extends Controller
         // Hitung NKO total (rata-rata semua pilar)
         $data['nko'] = $jumlahPilar > 0 ? round($totalNilai / $jumlahPilar, 2) : 0;
 
+        // Integrasi dengan notifikasi - ambil notifikasi terbaru
+        $latestNotifications = \App\Models\Notifikasi::where('user_id', Auth::id())
+            ->where('dibaca', false)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Integrasi dengan log aktivitas - ambil log aktivitas terbaru
+        $latestActivities = \App\Models\AktivitasLog::with('user')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        // Integrasi dengan KPI & Realisasi - ambil data KPI yang butuh verifikasi
+        $needVerification = \App\Models\NilaiKPI::with(['indikator.bidang', 'user'])
+            ->where('diverifikasi', false)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Data statistik tambahan
+        $kpiStats = [
+            'totalIndikator' => \App\Models\Indikator::where('aktif', true)->count(),
+            'totalTercapai' => \App\Models\NilaiKPI::where('tahun', $tahun)
+                ->where('bulan', $bulan)
+                ->where('persentase', '>=', 100)
+                ->count(),
+            'totalBelumTercapai' => \App\Models\NilaiKPI::where('tahun', $tahun)
+                ->where('bulan', $bulan)
+                ->where('persentase', '<', 100)
+                ->count(),
+            'totalBelumDiinput' => \App\Models\Indikator::where('aktif', true)->count() -
+                \App\Models\NilaiKPI::where('tahun', $tahun)
+                ->where('bulan', $bulan)
+                ->count()
+        ];
+
+        // Data untuk alert dashboard - indikator dengan nilai rendah
+        $poorPerformers = \App\Models\NilaiKPI::with(['indikator.bidang'])
+            ->where('tahun', $tahun)
+            ->where('bulan', $bulan)
+            ->where('persentase', '<', 70)
+            ->orderBy('persentase')
+            ->take(5)
+            ->get();
+
+        // Data perbandingan dengan bulan sebelumnya
+        $prevMonth = $bulan == 1 ? 12 : ($bulan - 1);
+        $prevYear = $bulan == 1 ? ($tahun - 1) : $tahun;
+
+        $comparisonData = [];
+        foreach ($pilars as $pilar) {
+            $currentValue = $pilar->getNilai($tahun, $bulan);
+            $prevValue = $pilar->getNilai($prevYear, $prevMonth);
+            $comparisonData[] = [
+                'name' => $pilar->nama,
+                'current' => $currentValue,
+                'previous' => $prevValue,
+                'change' => $currentValue - $prevValue
+            ];
+        }
+
         // Render dengan template dashboard/master
-        return view('dashboard.master', compact('data', 'tahun', 'bulan', 'periodeTipe'));
+        return view('dashboard.master', compact(
+            'data',
+            'tahun',
+            'bulan',
+            'periodeTipe',
+            'latestNotifications',
+            'latestActivities',
+            'needVerification',
+            'kpiStats',
+            'poorPerformers',
+            'comparisonData'
+        ));
     }
 
     /**
@@ -138,13 +211,86 @@ class DashboardController extends Controller
         // Dapatkan data historis untuk perbandingan bulan-bulan sebelumnya
         $historiData = $this->getHistoriData($bidang->id, $tahun);
 
+        // Integrasi dengan notifikasi - ambil notifikasi terbaru
+        $latestNotifications = \App\Models\Notifikasi::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Integrasi dengan aktivitas - ambil aktivitas terbaru untuk bidang ini
+        $latestActivities = \App\Models\AktivitasLog::with('user')
+            ->where(function($query) use ($bidang) {
+                $query->where('loggable_type', 'App\Models\NilaiKPI')
+                    ->whereHas('loggable', function($q) use ($bidang) {
+                        $q->whereHas('indikator', function($q2) use ($bidang) {
+                            $q2->where('bidang_id', $bidang->id);
+                        });
+                    });
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Data KPI yang belum diinput di bulan ini
+        $missingInputs = Indikator::where('bidang_id', $bidang->id)
+            ->where('aktif', true)
+            ->whereDoesntHave('nilaiKPIs', function($query) use ($tahun, $bulan) {
+                $query->where('tahun', $tahun)
+                    ->where('bulan', $bulan);
+            })
+            ->get();
+
+        // Perbandingan dengan bidang lain
+        $otherBidangs = Bidang::where('id', '!=', $bidang->id)->get();
+        $bidangComparison = [];
+
+        foreach ($otherBidangs as $other) {
+            $otherIndikators = Indikator::where('bidang_id', $other->id)
+                ->where('aktif', true)
+                ->get();
+
+            $otherTotal = 0;
+            foreach ($otherIndikators as $ind) {
+                $nilaiKPI = NilaiKPI::where('indikator_id', $ind->id)
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $bulan)
+                    ->first();
+
+                $otherTotal += $nilaiKPI ? $nilaiKPI->persentase : 0;
+            }
+
+            $otherAvg = $otherIndikators->count() > 0 ? round($otherTotal / $otherIndikators->count(), 2) : 0;
+
+            $bidangComparison[] = [
+                'nama' => $other->nama,
+                'nilai' => $otherAvg
+            ];
+        }
+
+        // Sort by nilai (descending)
+        usort($bidangComparison, function($a, $b) {
+            return $b['nilai'] <=> $a['nilai'];
+        });
+
         // Pastikan $indikators adalah collection (seharusnya sudah, karena hasil dari query Eloquent)
         // tapi lebih baik memastikan untuk keamanan
         if (!is_a($indikators, 'Illuminate\Support\Collection')) {
             $indikators = collect($indikators);
         }
 
-        return view('dashboard.admin', compact('bidang', 'indikators', 'rataRata', 'historiData', 'tahun', 'bulan', 'periodeTipe'));
+        return view('dashboard.admin', compact(
+            'bidang',
+            'indikators',
+            'rataRata',
+            'historiData',
+            'tahun',
+            'bulan',
+            'periodeTipe',
+            'latestNotifications',
+            'latestActivities',
+            'missingInputs',
+            'bidangComparison'
+        ));
     }
 
     /**
@@ -187,7 +333,74 @@ class DashboardController extends Controller
             ]);
         }
 
-        return view('dashboard.user', compact('bidangData', 'tahun', 'bulan'));
+        // Integrasi dengan notifikasi - ambil notifikasi terbaru
+        $latestNotifications = \App\Models\Notifikasi::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Performa terbaik dan terendah
+        $bestPerformer = $bidangData->sortByDesc('nilai')->first();
+        $worstPerformer = $bidangData->sortBy('nilai')->first();
+
+        // Data perubahan dari bulan sebelumnya
+        $prevMonth = $bulan == 1 ? 12 : ($bulan - 1);
+        $prevYear = $bulan == 1 ? ($tahun - 1) : $tahun;
+
+        $monthlyChange = [];
+        foreach ($bidangs as $bidang) {
+            $currentMonth = 0;
+            $previousMonth = 0;
+
+            $indikators = Indikator::where('bidang_id', $bidang->id)->where('aktif', true)->get();
+
+            foreach ($indikators as $indikator) {
+                $nilaiCurrent = NilaiKPI::where('indikator_id', $indikator->id)
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $bulan)
+                    ->where('periode_tipe', 'bulanan')
+                    ->first();
+
+                $nilaiPrevious = NilaiKPI::where('indikator_id', $indikator->id)
+                    ->where('tahun', $prevYear)
+                    ->where('bulan', $prevMonth)
+                    ->where('periode_tipe', 'bulanan')
+                    ->first();
+
+                $currentMonth += $nilaiCurrent ? $nilaiCurrent->persentase : 0;
+                $previousMonth += $nilaiPrevious ? $nilaiPrevious->persentase : 0;
+            }
+
+            $currentAvg = $indikators->count() > 0 ? $currentMonth / $indikators->count() : 0;
+            $previousAvg = $indikators->count() > 0 ? $previousMonth / $indikators->count() : 0;
+
+            $monthlyChange[] = [
+                'nama' => $bidang->nama,
+                'current' => round($currentAvg, 2),
+                'previous' => round($previousAvg, 2),
+                'change' => round($currentAvg - $previousAvg, 2)
+            ];
+        }
+
+        // Indikator dengan performa terbaik
+        $bestIndikators = NilaiKPI::with(['indikator.bidang'])
+            ->where('tahun', $tahun)
+            ->where('bulan', $bulan)
+            ->where('periode_tipe', 'bulanan')
+            ->orderByDesc('persentase')
+            ->take(5)
+            ->get();
+
+        return view('dashboard.user', compact(
+            'bidangData',
+            'tahun',
+            'bulan',
+            'latestNotifications',
+            'bestPerformer',
+            'worstPerformer',
+            'monthlyChange',
+            'bestIndikators'
+        ));
     }
 
     /**

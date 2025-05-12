@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\ActivityLoggable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, ActivityLoggable;
 
     /**
      * Atribut yang boleh diisi massal.
@@ -106,5 +107,13 @@ class User extends Authenticatable
         }
 
         return $bidang->indikators;
+    }
+
+    /**
+     * Mendapatkan judul untuk log aktivitas
+     */
+    public function getActivityLogTitle()
+    {
+        return $this->name;
     }
 }

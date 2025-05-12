@@ -2,6 +2,48 @@
 
 @section('title', 'Data Target Kinerja')
 
+@section('styles')
+<style>
+    /* Styling untuk mode dark dan light */
+    .card {
+        background-color: var(--pln-surface);
+        box-shadow: 0 4px 10px var(--pln-shadow);
+        color: var(--pln-text);
+    }
+
+    .card-header {
+        background-color: var(--pln-accent-bg) !important;
+        border-bottom: 1px solid var(--pln-border);
+    }
+
+    .text-primary {
+        color: var(--pln-light-blue) !important;
+    }
+
+    .table {
+        color: var(--pln-text);
+    }
+
+    .table-bordered,
+    .table-bordered td,
+    .table-bordered th {
+        border-color: var(--pln-border);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: var(--pln-accent-bg);
+    }
+
+    .bg-light {
+        background-color: var(--pln-accent-bg) !important;
+    }
+
+    .text-muted {
+        color: var(--pln-text-secondary) !important;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -10,6 +52,25 @@
 
     @include('components.alert')
 
+    @if(!$tahunPenilaian)
+    <!-- Pesan tidak ada tahun penilaian -->
+    <div class="alert alert-info shadow-sm border-left-info">
+        <div class="d-flex align-items-center">
+            <div class="mr-3">
+                <i class="fas fa-calendar-alt fa-2x text-info"></i>
+            </div>
+            <div>
+                <h5 class="font-weight-bold mb-1">Tidak Ada Tahun Penilaian</h5>
+                <p class="mb-0">Tidak ada tahun penilaian yang tersedia. Silakan hubungi administrator untuk membuat tahun penilaian baru.</p>
+            </div>
+        </div>
+        <div class="mt-3">
+            <a href="{{ route('dashboard') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+    @else
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">Daftar Target KPI Tahun {{ $tahunPenilaian->tahun }}</h6>
@@ -22,7 +83,7 @@
                         @foreach(\App\Models\TahunPenilaian::orderBy('tahun', 'desc')->get() as $tp)
                             <a class="dropdown-item {{ $tp->id == $tahunPenilaian->id ? 'active' : '' }}"
                                href="{{ route('targetKinerja.index', ['tahun_penilaian_id' => $tp->id]) }}">
-                                {{ $tp->tahun }} {{ $tp->is_active ? '(Aktif)' : '' }}
+                                {{ $tp->tahun }} {{ $tp->is_aktif ? '(Aktif)' : '' }}
                             </a>
                         @endforeach
                     </div>
@@ -108,7 +169,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center">Tidak ada indikator aktif untuk bidang ini</td>
+                                <td colspan="7" class="text-center">Tidak ada indikator untuk bidang ini</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -116,5 +177,6 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection

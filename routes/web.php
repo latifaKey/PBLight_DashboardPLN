@@ -27,7 +27,7 @@ use App\Models\NilaiKPI;
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 
     // Proses login
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -131,10 +131,28 @@ use App\Models\NilaiKPI;
 
         // Route untuk KPI
         Route::resource('kpi', KPIController::class);
-        Route::get('/kpi/verifikasi', [KPIController::class, 'verifikasi'])->name('kpi.verifikasi');
-        Route::post('/kpi/verifikasi', [KPIController::class, 'prosesVerifikasi'])->name('kpi.proses-verifikasi');
-        Route::get('/kpi/history', [KPIController::class, 'history'])->name('kpi.history');
-        Route::get('/kpi/laporan', [KPIController::class, 'laporan'])->name('kpi.laporan');
+
+        // Routes khusus KPI
+        Route::middleware(['auth'])->prefix('kpi')->name('kpi.')->group(function () {
+            // Verifikasi KPI
+            Route::get('/verifikasi', [KPIController::class, 'verifikasi'])->name('verifikasi');
+            Route::post('/verifikasi', [KPIController::class, 'prosesVerifikasi'])->name('prosesVerifikasi');
+
+            // Laporan KPI
+            Route::get('/laporan', [KPIController::class, 'laporan'])->name('laporan');
+
+            // Riwayat KPI (redirect ke index untuk kompatibilitas)
+            Route::get('/history', function() {
+                return redirect()->route('kpi.index');
+            })->name('history');
+
+            Route::get('/history/export/excel', [KPIController::class, 'exportRiwayatToExcel'])->name('export.excel');
+            Route::get('/history/export/pdf', [KPIController::class, 'exportRiwayatToPDF'])->name('export.pdf');
+            Route::post('/history/finalisasi/{nilaiId}', [KPIController::class, 'finalisasiNilai'])->name('finalisasi');
+
+            // Ini harus selalu di akhir karena ada parameter dinamis
+            Route::get('/history/{indikatorId}', [KPIController::class, 'detailRiwayat'])->name('detail.riwayat');
+        });
 
         // Resource controllers untuk fitur CRUD
         Route::resource('verifikasi', VerifikasiController::class);
@@ -179,13 +197,13 @@ use App\Models\NilaiKPI;
         Route::get('/notifikasi/jumlah-belum-dibaca', [NotifikasiController::class, 'getJumlahBelumDibaca'])->name('notifikasi.getJumlahBelumDibaca');
         Route::get('/notifikasi/terbaru', [NotifikasiController::class, 'getNotifikasiTerbaru'])->name('notifikasi.getNotifikasiTerbaru');
 
-        // Aktivitas Log hanya untuk asisten_manager - menggunakan route group biasa tanpa middleware closure
-        Route::prefix('aktivitas-log')->name('aktivitasLog.')->middleware('auth')->group(function () {
-            // Buat middleware check role di controller
+        // Log Aktivitas
+        Route::prefix('aktivitas-log')->name('aktivitasLog.')->group(function () {
             Route::get('/', [AktivitasLogController::class, 'index'])->name('index');
             Route::get('/ekspor-csv', [AktivitasLogController::class, 'eksporCsv'])->name('eksporCsv');
             Route::post('/hapus-log-lama', [AktivitasLogController::class, 'hapusLogLama'])->name('hapusLogLama');
-            // Parameter route harus selalu di paling bawah untuk menghindari konflik dengan route lain
+            Route::delete('/{id}', [AktivitasLogController::class, 'destroy'])->name('destroy');
+            Route::post('/hapus-multiple', [AktivitasLogController::class, 'hapusMultiple'])->name('hapusMultiple');
             Route::get('/{id}', [AktivitasLogController::class, 'show'])->name('show')->where('id', '[0-9]+');
         });
 
@@ -214,6 +232,8 @@ use App\Models\NilaiKPI;
                 Route::get('/', [AktivitasLogController::class, 'index'])->name('index');
                 Route::get('/ekspor-csv', [AktivitasLogController::class, 'eksporCsv'])->name('eksporCsv');
                 Route::post('/hapus-log-lama', [AktivitasLogController::class, 'hapusLogLama'])->name('hapusLogLama');
+                Route::delete('/{id}', [AktivitasLogController::class, 'destroy'])->name('destroy');
+                Route::post('/hapus-multiple', [AktivitasLogController::class, 'hapusMultiple'])->name('hapusMultiple');
                 Route::get('/{id}', [AktivitasLogController::class, 'show'])->name('show')->where('id', '[0-9]+');
             });
         });
@@ -228,17 +248,8 @@ use App\Models\NilaiKPI;
         });
 
         // ========== ROUTES UNTUK SEMUA (ADMIN & KARYAWAN) ==========
-        // KPI Resource routes untuk melihat & membaca data
-        Route::get('/kpi', [KPIController::class, 'index'])->name('kpi.index');
-        Route::get('/kpi/history', [KPIController::class, 'history'])->name('kpi.history');
-        Route::get('/kpi/laporan', [KPIController::class, 'laporan'])->name('kpi.laporan');
-        Route::get('/kpi/{id}', [KPIController::class, 'show'])->name('kpi.show');
-
-        // Routes khusus admin & master admin
-        Route::middleware(['auth'])->group(function () {
-            Route::get('/kpi/create', [KPIController::class, 'create'])->name('kpi.create');
-            Route::post('/kpi', [KPIController::class, 'store'])->name('kpi.store');
-        });
+        // Semua routes KPI sudah diatur di atas dengan Resource dan Group
+        // Hapus semua duplikasi route KPI di bagian ini
     });
 
     // ========== DASHBOARD LEGACY (DEPRECATED) ==========

@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\ActivityLoggable;
 
 class Bidang extends Model
 {
+    use HasFactory, ActivityLoggable;
+
     protected $fillable = [
         'nama',
         'kode',
@@ -54,5 +58,13 @@ class Bidang extends Model
         }
 
         return round($totalNilai / $indikators->count(), 2);
+    }
+
+    /**
+     * Mendapatkan judul untuk log aktivitas
+     */
+    public function getActivityLogTitle()
+    {
+        return $this->nama;
     }
 }

@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\ActivityLoggable;
 
 class Pilar extends Model
 {
+    use HasFactory, ActivityLoggable;
+
     protected $fillable = [
         'kode',
         'nama',
@@ -44,5 +48,13 @@ class Pilar extends Model
         }
 
         return round($totalNilaiTertimbang, 2);
+    }
+
+    /**
+     * Mendapatkan judul untuk log aktivitas
+     */
+    public function getActivityLogTitle()
+    {
+        return $this->nama;
     }
 }

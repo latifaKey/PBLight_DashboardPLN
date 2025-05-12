@@ -11,6 +11,7 @@ use App\Models\Notifikasi;
 use App\Models\AktivitasLog;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\User;
 
 class KPIController extends Controller
 {
@@ -436,6 +437,9 @@ class KPIController extends Controller
         $user = Auth::user();
         $tahun = $request->tahun ?? date('Y');
 
+        // Simpan dalam histori pencarian
+        $this->logHistoriPencarian($user, 'history_kpi', 'Mengakses riwayat KPI tahun ' . $tahun);
+
         if ($user->isMasterAdmin()) {
             // Master admin bisa melihat semua data
             $pilars = Pilar::with(['indikators' => function($query) {
@@ -448,7 +452,10 @@ class KPIController extends Controller
                 }
             }
 
-            return view('kpi.history', compact('pilars', 'tahun'));
+            // Tambahkan statistics data untuk dashboard
+            $statistics = $this->getHistoryStatistics($pilars, $tahun);
+
+            return view('kpi.history', compact('pilars', 'tahun', 'statistics'));
         } elseif ($user->isAdmin()) {
             // Admin hanya bisa melihat data bidangnya
             $bidang = $user->getBidang();
@@ -466,21 +473,212 @@ class KPIController extends Controller
                 $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
             }
 
-            return view('kpi.history_admin', compact('bidang', 'indikators', 'tahun'));
+            // Tambahkan statistics data untuk dashboard
+            $statistics = $this->getIndikatorStatistics($indikators, $tahun, $bidang->nama);
+
+            // Buat struktur data yang sama dengan view master admin
+            $pilars = collect([
+                (object)[
+                    'kode' => $bidang->kode ?? 'BD',
+                    'nama' => $bidang->nama,
+                    'indikators' => $indikators
+                ]
+            ]);
+
+            return view('kpi.history', compact('pilars', 'tahun', 'statistics'));
         } else {
             // Karyawan hanya bisa melihat ringkasan
             $bidangs = Bidang::all();
-            $bidangHistoriData = [];
+            $pilars = collect([]);
 
             foreach ($bidangs as $bidang) {
-                $bidangHistoriData[$bidang->id] = [
-                    'nama' => $bidang->nama,
-                    'data' => $this->getBidangHistoriData($bidang->id, $tahun),
-                ];
+                $indikators = Indikator::where('bidang_id', $bidang->id)
+                    ->where('aktif', true)
+                    ->orderBy('kode')
+                    ->get();
+
+                foreach ($indikators as $indikator) {
+                    $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
+                }
+
+                // Tambahkan sebagai pilar agar struktur data konsisten dengan view
+                if ($indikators->isNotEmpty()) {
+                    $pilars->push((object)[
+                        'kode' => $bidang->kode ?? 'BD',
+                        'nama' => $bidang->nama,
+                        'indikators' => $indikators
+                    ]);
+                }
             }
 
-            return view('kpi.history_user', compact('bidangHistoriData', 'tahun'));
+            // Tambahkan statistics data untuk dashboard
+            $statistics = $this->getAllBidangStatistics($pilars, $tahun);
+
+            return view('kpi.history', compact('pilars', 'tahun', 'statistics'));
         }
+    }
+
+    /**
+     * Menghitung statistik untuk data historis KPI
+     */
+    private function getHistoryStatistics($pilars, $tahun)
+    {
+        $totalIndikator = 0;
+        $totalTercapai = 0;
+        $totalDiverifikasi = 0;
+        $performaRatarata = 0;
+        $totalNilai = 0;
+        $totalData = 0;
+
+        foreach ($pilars as $pilar) {
+            foreach ($pilar->indikators as $indikator) {
+                $totalIndikator++;
+                $indikatorTercapai = false;
+                $indikatorNilai = 0;
+                $indikatorCount = 0;
+
+                foreach ($indikator->historiData as $data) {
+                    if ($data['nilai'] > 0) {
+                        $indikatorNilai += $data['nilai'];
+                        $indikatorCount++;
+                        $totalData++;
+
+                        if ($data['nilai'] >= 80) {
+                            $indikatorTercapai = true;
+                        }
+
+                        if ($data['diverifikasi']) {
+                            $totalDiverifikasi++;
+                        }
+
+                        $totalNilai += $data['nilai'];
+                    }
+                }
+
+                if ($indikatorTercapai) {
+                    $totalTercapai++;
+                }
+            }
+        }
+
+        $performaRatarata = $totalData > 0 ? round($totalNilai / $totalData, 2) : 0;
+        $persentaseTercapai = $totalIndikator > 0 ? round(($totalTercapai / $totalIndikator) * 100, 2) : 0;
+        $persentaseDiverifikasi = $totalData > 0 ? round(($totalDiverifikasi / $totalData) * 100, 2) : 0;
+
+        return [
+            'total_indikator' => $totalIndikator,
+            'indikator_tercapai' => $totalTercapai,
+            'persentase_tercapai' => $persentaseTercapai,
+            'persentase_diverifikasi' => $persentaseDiverifikasi,
+            'performa_ratarata' => $performaRatarata,
+        ];
+    }
+
+    /**
+     * Menghitung statistik untuk data historis KPI per bidang
+     */
+    private function getIndikatorStatistics($indikators, $tahun, $bidangNama)
+    {
+        $totalIndikator = $indikators->count();
+        $totalTercapai = 0;
+        $totalDiverifikasi = 0;
+        $performaRatarata = 0;
+        $totalNilai = 0;
+        $totalData = 0;
+
+        foreach ($indikators as $indikator) {
+            $indikatorTercapai = false;
+
+            foreach ($indikator->historiData as $data) {
+                if ($data['nilai'] > 0) {
+                    $totalNilai += $data['nilai'];
+                    $totalData++;
+
+                    if ($data['nilai'] >= 80) {
+                        $indikatorTercapai = true;
+                    }
+
+                    if ($data['diverifikasi']) {
+                        $totalDiverifikasi++;
+                    }
+                }
+            }
+
+            if ($indikatorTercapai) {
+                $totalTercapai++;
+            }
+        }
+
+        $performaRatarata = $totalData > 0 ? round($totalNilai / $totalData, 2) : 0;
+        $persentaseTercapai = $totalIndikator > 0 ? round(($totalTercapai / $totalIndikator) * 100, 2) : 0;
+        $persentaseDiverifikasi = $totalData > 0 ? round(($totalDiverifikasi / $totalData) * 100, 2) : 0;
+
+        return [
+            'bidang' => $bidangNama,
+            'total_indikator' => $totalIndikator,
+            'indikator_tercapai' => $totalTercapai,
+            'persentase_tercapai' => $persentaseTercapai,
+            'persentase_diverifikasi' => $persentaseDiverifikasi,
+            'performa_ratarata' => $performaRatarata,
+        ];
+    }
+
+    /**
+     * Menghitung statistik untuk semua bidang
+     */
+    private function getAllBidangStatistics($pilars, $tahun)
+    {
+        $statistik = [];
+        $totalIndikator = 0;
+        $totalTercapai = 0;
+        $totalDiverifikasi = 0;
+        $totalNilai = 0;
+        $totalData = 0;
+
+        foreach ($pilars as $pilar) {
+            $bidangStat = $this->getIndikatorStatistics($pilar->indikators, $tahun, $pilar->nama);
+            $statistik[] = $bidangStat;
+
+            $totalIndikator += $bidangStat['total_indikator'];
+            $totalTercapai += $bidangStat['indikator_tercapai'];
+            $totalNilai += ($bidangStat['performa_ratarata'] * $bidangStat['total_indikator']);
+            $totalData += $bidangStat['total_indikator'];
+            $totalDiverifikasi += ($bidangStat['persentase_diverifikasi'] * $bidangStat['total_indikator'] / 100);
+        }
+
+        $performaRatarata = $totalData > 0 ? round($totalNilai / $totalData, 2) : 0;
+        $persentaseTercapai = $totalIndikator > 0 ? round(($totalTercapai / $totalIndikator) * 100, 2) : 0;
+        $persentaseDiverifikasi = $totalIndikator > 0 ? round(($totalDiverifikasi / $totalIndikator) * 100, 2) : 0;
+
+        return [
+            'bidang_stats' => $statistik,
+            'total_indikator' => $totalIndikator,
+            'indikator_tercapai' => $totalTercapai,
+            'persentase_tercapai' => $persentaseTercapai,
+            'persentase_diverifikasi' => $persentaseDiverifikasi,
+            'performa_ratarata' => $performaRatarata,
+        ];
+    }
+
+    /**
+     * Mencatat histori pencarian
+     */
+    private function logHistoriPencarian($user, $tipe, $deskripsi)
+    {
+        // Catat log aktivitas
+        AktivitasLog::log(
+            $user,
+            'view',
+            $deskripsi,
+            'Mengakses halaman ' . $tipe,
+            null,
+            [
+                'tipe' => $tipe,
+                'parameter' => request()->all()
+            ],
+            request()->ip(),
+            request()->userAgent()
+        );
     }
 
     /**
@@ -488,12 +686,6 @@ class KPIController extends Controller
      */
     private function getIndikatorHistoriData($indikatorId, $tahun)
     {
-        $namaBulan = [
-            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
-            5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu',
-            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
-        ];
-
         $data = [];
 
         for ($bulan = 1; $bulan <= 12; $bulan++) {
@@ -504,49 +696,8 @@ class KPIController extends Controller
                 ->first();
 
             $data[] = [
-                'bulan' => $namaBulan[$bulan],
                 'nilai' => $nilaiKPI ? $nilaiKPI->persentase : 0,
                 'diverifikasi' => $nilaiKPI ? $nilaiKPI->diverifikasi : false,
-            ];
-        }
-
-        return $data;
-    }
-
-    /**
-     * Helper method untuk mendapatkan data historis bidang
-     */
-    private function getBidangHistoriData($bidangId, $tahun)
-    {
-        $namaBulan = [
-            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
-            5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu',
-            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
-        ];
-
-        $data = [];
-
-        for ($bulan = 1; $bulan <= 12; $bulan++) {
-            $indikators = Indikator::where('bidang_id', $bidangId)
-                ->where('aktif', true)
-                ->get();
-
-            $totalNilai = 0;
-            foreach ($indikators as $indikator) {
-                $nilaiKPI = NilaiKPI::where('indikator_id', $indikator->id)
-                    ->where('tahun', $tahun)
-                    ->where('bulan', $bulan)
-                    ->where('periode_tipe', 'bulanan')
-                    ->first();
-
-                $totalNilai += $nilaiKPI ? $nilaiKPI->persentase : 0;
-            }
-
-            $rataRata = $indikators->count() > 0 ? round($totalNilai / $indikators->count(), 2) : 0;
-
-            $data[] = [
-                'bulan' => $namaBulan[$bulan],
-                'nilai' => $rataRata,
             ];
         }
 
@@ -640,5 +791,218 @@ class KPIController extends Controller
 
             return view('kpi.laporan_user', compact('bidangData', 'tahun', 'bulan'));
         }
+    }
+
+    /**
+     * Ekspor data Riwayat KPI ke Excel
+     */
+    public function exportRiwayatToExcel(Request $request)
+    {
+        $user = Auth::user();
+        $tahun = $request->tahun ?? date('Y');
+
+        // Log aktivitas ekspor
+        AktivitasLog::log(
+            $user,
+            'export',
+            'Mengekspor data riwayat KPI ' . $tahun . ' ke Excel',
+            'Ekspor data ke Excel',
+            null,
+            [
+                'tahun' => $tahun,
+                'format' => 'excel',
+                'filter' => $request->all()
+            ],
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        // Logika untuk mengambil data sesuai dengan halaman history()
+        if ($user->isMasterAdmin()) {
+            $pilars = Pilar::with(['indikators' => function($query) {
+                $query->where('aktif', true)->orderBy('kode');
+            }])->orderBy('urutan')->get();
+
+            foreach ($pilars as $pilar) {
+                foreach ($pilar->indikators as $indikator) {
+                    $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
+                }
+            }
+
+            // Output ke excel (contoh implementasi sederhana)
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil diekspor',
+                'tahun' => $tahun
+            ]);
+        }
+
+        // Jika bukan master admin, redirect ke halaman riwayat
+        return redirect()->route('kpi.history')->with('error', 'Anda tidak memiliki akses untuk mengekspor data ini');
+    }
+
+    /**
+     * Ekspor data Riwayat KPI ke PDF
+     */
+    public function exportRiwayatToPDF(Request $request)
+    {
+        $user = Auth::user();
+        $tahun = $request->tahun ?? date('Y');
+
+        // Log aktivitas ekspor
+        AktivitasLog::log(
+            $user,
+            'export',
+            'Mengekspor data riwayat KPI ' . $tahun . ' ke PDF',
+            'Ekspor data ke PDF',
+            null,
+            [
+                'tahun' => $tahun,
+                'format' => 'pdf',
+                'filter' => $request->all()
+            ],
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        // Logika untuk mengambil data sesuai dengan halaman history()
+        if ($user->isMasterAdmin()) {
+            $pilars = Pilar::with(['indikators' => function($query) {
+                $query->where('aktif', true)->orderBy('kode');
+            }])->orderBy('urutan')->get();
+
+            foreach ($pilars as $pilar) {
+                foreach ($pilar->indikators as $indikator) {
+                    $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
+                }
+            }
+
+            // Output ke PDF (contoh implementasi sederhana)
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil diekspor ke PDF',
+                'tahun' => $tahun
+            ]);
+        }
+
+        // Jika bukan master admin, redirect ke halaman riwayat
+        return redirect()->route('kpi.history')->with('error', 'Anda tidak memiliki akses untuk mengekspor data ini');
+    }
+
+    /**
+     * Menampilkan detail riwayat KPI per indikator
+     */
+    public function detailRiwayat(Request $request, $indikatorId)
+    {
+        $user = Auth::user();
+        $tahun = $request->tahun ?? date('Y');
+
+        $indikator = Indikator::findOrFail($indikatorId);
+
+        // Cek apakah user memiliki akses
+        if (!$user->isMasterAdmin() && !$user->isAdmin()) {
+            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke halaman ini');
+        }
+
+        if ($user->isAdmin()) {
+            $bidang = $user->getBidang();
+            if (!$bidang || $indikator->bidang_id != $bidang->id) {
+                return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses untuk melihat indikator ini');
+            }
+        }
+
+        // Ambil data riwayat
+        $nilaiKPIs = NilaiKPI::where('indikator_id', $indikatorId)
+            ->where('tahun', $tahun)
+            ->where('periode_tipe', 'bulanan')
+            ->orderBy('bulan')
+            ->get();
+
+        // Ambil data riwayat yang sudah difinalisasi
+        $nilaiRiwayat = NilaiRiwayatKPI::where('indikator_id', $indikatorId)
+            ->where('tahun', $tahun)
+            ->where('periode_tipe', 'bulanan')
+            ->orderBy('bulan')
+            ->get();
+
+        // Catat log aktivitas
+        AktivitasLog::log(
+            $user,
+            'view',
+            'Melihat detail riwayat KPI untuk indikator ' . $indikator->nama,
+            'Akses detail riwayat',
+            $indikator,
+            [
+                'indikator_id' => $indikatorId,
+                'tahun' => $tahun
+            ],
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        return view('kpi.detail_riwayat', compact('indikator', 'nilaiKPIs', 'nilaiRiwayat', 'tahun'));
+    }
+
+    /**
+     * Finalisasi nilai KPI untuk riwayat
+     */
+    public function finalisasiNilai(Request $request, $nilaiId)
+    {
+        $user = Auth::user();
+
+        // Cek apakah user memiliki akses
+        if (!$user->isMasterAdmin() && !$user->isAdmin()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk melakukan finalisasi');
+        }
+
+        $nilai = NilaiKPI::findOrFail($nilaiId);
+
+        if ($user->isAdmin()) {
+            $bidang = $user->getBidang();
+            if (!$bidang || $nilai->indikator->bidang_id != $bidang->id) {
+                return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk memfinalisasi nilai ini');
+            }
+        }
+
+        // Buat rekam riwayat
+        $riwayat = NilaiRiwayatKPI::firstOrNew([
+            'nilai_kpi_id' => $nilai->id,
+            'indikator_id' => $nilai->indikator_id,
+            'tahun' => $nilai->tahun,
+            'bulan' => $nilai->bulan,
+            'periode_tipe' => $nilai->periode_tipe
+        ]);
+
+        // Isi data
+        $riwayat->nilai = $nilai->nilai;
+        $riwayat->target = $nilai->target;
+        $riwayat->persentase = $nilai->persentase;
+        $riwayat->diverifikasi = $nilai->diverifikasi;
+        $riwayat->finalisasi_oleh = $user->id;
+        $riwayat->finalisasi_tanggal = now();
+        $riwayat->keterangan = $request->keterangan;
+        $riwayat->file_bukti = $nilai->file_bukti;
+        $riwayat->save();
+
+        // Catat log aktivitas
+        AktivitasLog::log(
+            $user,
+            'finalize',
+            'Memfinalisasi nilai KPI ' . $nilai->indikator->nama . ' periode ' . $nilai->bulan . '/' . $nilai->tahun,
+            'Finalisasi nilai untuk riwayat',
+            $nilai->indikator,
+            [
+                'nilai_id' => $nilai->id,
+                'indikator_id' => $nilai->indikator_id,
+                'tahun' => $nilai->tahun,
+                'bulan' => $nilai->bulan,
+                'persentase' => $nilai->persentase,
+                'keterangan' => $request->keterangan
+            ],
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        return redirect()->back()->with('success', 'Nilai KPI berhasil difinalisasi untuk riwayat');
     }
 }

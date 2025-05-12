@@ -5,9 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\ActivityLoggable;
 
 class Indikator extends Model
 {
+    use HasFactory, ActivityLoggable;
+
     protected $fillable = [
         'pilar_id',
         'bidang_id',
@@ -100,5 +104,13 @@ class Indikator extends Model
             ->orderBy('minggu')
             ->get()
             ->toArray();
+    }
+
+    /**
+     * Mendapatkan judul untuk log aktivitas
+     */
+    public function getActivityLogTitle()
+    {
+        return $this->nama;
     }
 }

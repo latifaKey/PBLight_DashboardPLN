@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('aktivitas_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('tipe'); // login, logout, create, update, delete, verify
+            $table->string('judul')->nullable();
             $table->string('deskripsi');
+            $table->string('loggable_type')->nullable();
+            $table->unsignedBigInteger('loggable_id')->nullable();
             $table->json('data')->nullable(); // JSON data
             $table->string('ip_address')->nullable();
             $table->text('user_agent')->nullable();
             $table->timestamps();
+
+            $table->index(['loggable_type', 'loggable_id']);
         });
     }
 

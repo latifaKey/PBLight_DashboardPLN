@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\ActivityLoggable;
 
 class NilaiKPI extends Model
 {
+    use HasFactory, ActivityLoggable;
+
     protected $table = 'nilai_kpi';
+    protected $guarded = ['id'];
 
     protected $fillable = [
         'indikator_id',
@@ -36,7 +41,7 @@ class NilaiKPI extends Model
      */
     public function indikator(): BelongsTo
     {
-        return $this->belongsTo(Indikator::class);
+        return $this->belongsTo(Indikator::class, 'indikator_id');
     }
 
     /**
@@ -53,6 +58,22 @@ class NilaiKPI extends Model
     public function verifikator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verifikasi_oleh');
+    }
+
+    /**
+     * Mendapatkan tahun penilaian terkait nilai ini
+     */
+    public function tahunPenilaian(): BelongsTo
+    {
+        return $this->belongsTo(TahunPenilaian::class, 'tahun', 'tahun');
+    }
+
+    /**
+     * Mendapatkan nilai finalisasi (riwayat) terkait nilai ini
+     */
+    public function riwayat()
+    {
+        return $this->hasOne(NilaiRiwayatKPI::class, 'nilai_kpi_id');
     }
 
     /**
@@ -94,5 +115,29 @@ class NilaiKPI extends Model
         ];
 
         return $namaBulan[$this->bulan] ?? '';
+    }
+
+    /**
+     * Mendapatkan judul untuk log aktivitas
+     */
+    public function getActivityLogTitle()
+    {
+        return 'Nilai KPI ' . $this->indikator->nama . ' ' . $this->bulan . '/' . $this->tahunPenilaian->tahun;
+    }
+
+    /**
+     * Fungsi untuk cek status verifikasi
+     */
+    public function isVerified()
+    {
+        return $this->diverifikasi;
+    }
+
+    /**
+     * Fungsi untuk riwayat status
+     */
+    public function hasRiwayat()
+    {
+        return $this->riwayat()->exists();
     }
 }

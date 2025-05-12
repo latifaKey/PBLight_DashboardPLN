@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\ActivityLoggable;
 
 class TargetKPI extends Model
 {
+    use HasFactory, ActivityLoggable;
+
     protected $table = 'target_kpi';
 
     protected $fillable = [
@@ -92,5 +96,13 @@ class TargetKPI extends Model
         }
 
         return min(100, ($nilai / $target) * 100);
+    }
+
+    /**
+     * Mendapatkan judul untuk log aktivitas
+     */
+    public function getActivityLogTitle()
+    {
+        return 'Target KPI ' . $this->indikator->nama . ' Tahun ' . $this->tahun_penilaian->tahun;
     }
 }

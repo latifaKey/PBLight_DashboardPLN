@@ -80,6 +80,8 @@ class AkunController extends Controller
             Auth::user(),
             'create',
             'Membuat akun baru: ' . $user->name . ' (' . $user->role . ')',
+            'Menambahkan akun pengguna baru',
+            $user,
             [
                 'user_id' => $user->id,
                 'email' => $user->email,
@@ -161,6 +163,8 @@ class AkunController extends Controller
             Auth::user(),
             'update',
             'Mengupdate akun: ' . $user->name,
+            'Mengubah data akun pengguna',
+            $user,
             [
                 'user_id' => $user->id,
                 'email' => $user->email,
@@ -197,6 +201,8 @@ class AkunController extends Controller
             Auth::user(),
             'delete',
             'Menghapus akun: ' . $userName . ' (' . $userRole . ')',
+            'Menghapus akun pengguna dari sistem',
+            null,
             [
                 'user_id' => $id,
                 'role' => $userRole,

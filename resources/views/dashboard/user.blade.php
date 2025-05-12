@@ -408,463 +408,613 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Tambahan gaya untuk komponen terintegrasi */
+  .notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 330px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    display: flex;
+    background: var(--pln-surface);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: white;
+  }
+
+  .bg-info {
+    background: var(--pln-light-blue);
+  }
+
+  .bg-success {
+    background: #4CAF50;
+  }
+
+  .bg-warning {
+    background: #FFC107;
+  }
+
+  .bg-danger {
+    background: #F44336;
+  }
+
+  .notification-content {
+    flex: 1;
+  }
+
+  .notification-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 5px;
+    color: var(--pln-text);
+  }
+
+  .notification-message {
+    font-size: 14px;
+    color: var(--pln-text-secondary);
+    margin: 0 0 5px;
+  }
+
+  .notification-time {
+    font-size: 12px;
+    color: var(--pln-text-secondary);
+    font-style: italic;
+  }
+
+  /* Change list styles */
+  .change-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 330px;
+    overflow-y: auto;
+  }
+
+  .change-item {
+    background: var(--pln-surface);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .change-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .change-bidang {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--pln-text);
+    margin-bottom: 10px;
+  }
+
+  .change-values {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .change-current {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--pln-text);
+  }
+
+  .change-arrow {
+    margin: 0 8px;
+    font-size: 14px;
+  }
+
+  .change-arrow.positive {
+    color: #4CAF50;
+  }
+
+  .change-arrow.negative {
+    color: #F44336;
+  }
+
+  .change-previous {
+    font-size: 14px;
+    color: var(--pln-text-secondary);
+  }
+
+  .change-diff {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .text-success {
+    color: #4CAF50;
+  }
+
+  .text-danger {
+    color: #F44336;
+  }
+
+  /* Best list styles */
+  .best-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 330px;
+    overflow-y: auto;
+  }
+
+  .best-item {
+    background: var(--pln-surface);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+  }
+
+  .best-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .best-badge {
+    float: right;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    background: #4CAF50;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin-left: 10px;
+  }
+
+  .best-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--pln-text);
+    margin: 0 0 5px;
+  }
+
+  .best-bidang {
+    font-size: 14px;
+    color: var(--pln-text-secondary);
+    margin: 0 0 10px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    color: var(--pln-text-secondary);
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+    opacity: 0.6;
+  }
+
+  /* Bidang Grid styles */
+  .bidang-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .bidang-card {
+    background: var(--pln-surface);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  .bidang-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .bidang-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .bidang-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--pln-text);
+    margin: 0;
+  }
+
+  .bidang-progress {
+    margin: 15px 0;
+  }
+
+  .bidang-status {
+    margin-bottom: 15px;
+  }
+
+  .status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .status-success {
+    background-color: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+  }
+
+  .status-good {
+    background-color: rgba(33, 150, 243, 0.15);
+    color: #2196F3;
+  }
+
+  .status-medium {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #FFC107;
+  }
+
+  .status-poor {
+    background-color: rgba(244, 67, 54, 0.15);
+    color: #F44336;
+  }
+
+  /* Button styles */
+  .btn-action {
+    background: var(--pln-light-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-action:hover {
+    background: var(--pln-blue);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .btn-action.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
 </style>
 @endsection
 
 @section('content')
 <div class="dashboard-content">
-  <!-- Stat Cards -->
-  <div class="dashboard-row">
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">NKO Score</h3>
-          <div class="stat-icon">
-            <i class="fas fa-chart-line"></i>
-          </div>
+    <!-- Filter dan Periode -->
+    <div class="filter-row row mb-4">
+        <div class="col-md-8">
+            <form action="{{ route('dashboard') }}" method="GET" class="d-flex">
+                <div class="form-group mr-3">
+                    <label for="tahun">Tahun</label>
+                    <select class="form-control" id="tahun" name="tahun" onchange="this.form.submit()">
+                        @for ($i = date('Y'); $i >= 2020; $i--)
+                            <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bulan">Bulan</label>
+                    <select class="form-control" id="bulan" name="bulan" onchange="this.form.submit()">
+                        @php
+                            $namaBulan = [
+                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                            ];
+                        @endphp
+                        @foreach ($namaBulan as $key => $nama)
+                            <option value="{{ $key }}" {{ $bulan == $key ? 'selected' : '' }}>{{ $nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
         </div>
-        @php
-        $rataRataNKO = $bidangData->avg('nilai');
-        $bidangTerbaik = $bidangData->sortByDesc('nilai')->first() ?? ['nama' => '-', 'nilai' => 0];
-        @endphp
-        <div class="stat-value">{{ number_format($rataRataNKO, 1) }}</div>
-        <p class="stat-description">Nilai Kinerja Organisasi</p>
-      </div>
-    </div>
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Bidang</h3>
-          <div class="stat-icon">
-            <i class="fas fa-building"></i>
-          </div>
-        </div>
-        <div class="stat-value">{{ count($bidangData) }}</div>
-        <p class="stat-description">Jumlah Bidang</p>
-      </div>
-    </div>
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Terbaik</h3>
-          <div class="stat-icon">
-            <i class="fas fa-trophy"></i>
-          </div>
-        </div>
-        <div class="stat-value">{{ $bidangTerbaik['nama'] }}</div>
-        <p class="stat-description">Bidang Nilai Tertinggi</p>
-      </div>
-    </div>
-    <div class="dashboard-col">
-      <div class="stat-card">
-        <div class="stat-header">
-          <h3 class="stat-title">Periode</h3>
-          <div class="stat-icon">
-            <i class="fas fa-calendar-alt"></i>
-          </div>
-        </div>
-        <div class="stat-value">{{ $bulan }}/{{ $tahun }}</div>
-        <p class="stat-description">Periode Penilaian</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Performance Gauge & Chart -->
-  <div class="row align-items-center">
-    <div class="col-md-3">
-      <div class="meter-container">
-        <canvas id="gaugeChart"></canvas>
-        <div class="nko-label">NKO</div>
-        <div class="nko-value">{{ number_format($rataRataNKO, 1) }}</div>
-      </div>
     </div>
 
-    <div class="col-md-9">
-      <div class="chart-container">
-        <h3 class="chart-title">
-          <i class="fas fa-chart-bar mr-2"></i>
-          Perbandingan Kinerja Bidang
-        </h3>
-        <canvas id="bidangChart" style="max-height: 280px;"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bidang Cards -->
-  <div class="bidang-grid-container">
-    <h3 class="bidang-grid-title">
-      <i class="fas fa-building mr-2"></i>
-      Detail Kinerja Per Bidang
-    </h3>
-
-    <!-- Tabs untuk filter kategori bidang -->
-    <ul class="nav nav-tabs" id="bidangTabs" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" id="semua-tab" data-toggle="tab" href="#semua-bidang" role="tab">
-          Semua Bidang <span class="badge badge-pill badge-secondary ml-1">{{ count($bidangData) }}</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="terbaik-tab" data-toggle="tab" href="#terbaik-bidang" role="tab">
-          Kinerja Terbaik <span class="badge badge-pill badge-success ml-1">{{ $bidangData->where('nilai', '>=', 80)->count() }}</span>
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" id="terendah-tab" data-toggle="tab" href="#terendah-bidang" role="tab">
-          Kinerja Terendah <span class="badge badge-pill badge-warning ml-1">{{ $bidangData->where('nilai', '<', 70)->count() }}</span>
-        </a>
-      </li>
-    </ul>
-
-    <div class="tab-content" id="bidangTabsContent">
-      <!-- Tab Semua Bidang -->
-      <div class="tab-pane fade show active" id="semua-bidang" role="tabpanel">
-        <div class="bidang-grid">
-          @foreach($bidangData->take(6) as $index => $bidang)
-          <div class="bidang-card">
-            <h3 class="bidang-title">{{ $bidang['nama'] }}</h3>
-            <div class="bidang-value">{{ $bidang['nilai'] }}%</div>
-
-            @php
-              $progressClass = 'progress-red';
-              if ($bidang['nilai'] >= 70) {
-                $progressClass = 'progress-green';
-              } elseif ($bidang['nilai'] >= 50) {
-                $progressClass = 'progress-yellow';
-              }
-            @endphp
-            <div class="progress">
-              <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $bidang['nilai'] }}%"></div>
+    <!-- Row 1: Statistik Bidang -->
+    <div class="dashboard-row">
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Performa Tertinggi</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                </div>
+                <h3 class="stat-value">{{ $bestPerformer['nama'] }}</h3>
+                <p class="stat-description">{{ $bestPerformer['nilai'] }}% pencapaian</p>
             </div>
-
-            <canvas id="bidangDetailChart{{ $index }}" style="max-height: 120px;"></canvas>
-          </div>
-          @endforeach
         </div>
-
-        @if(count($bidangData) > 6)
-        <div class="pagination-container">
-          <ul class="pagination">
-            <li><a href="#" class="active">1</a></li>
-            <li><a href="#">2</a></li>
-            @if(count($bidangData) > 12)
-            <li><a href="#">3</a></li>
-            @endif
-            <li><a href="#"><i class="fas fa-chevron-right"></i></a></li>
-          </ul>
-        </div>
-        @endif
-      </div>
-
-      <!-- Tab Bidang Terbaik -->
-      <div class="tab-pane fade" id="terbaik-bidang" role="tabpanel">
-        <div class="bidang-grid">
-          @foreach($bidangData->where('nilai', '>=', 80)->take(6) as $index => $bidang)
-          <div class="bidang-card">
-            <h3 class="bidang-title">{{ $bidang['nama'] }}</h3>
-            <div class="bidang-value">{{ $bidang['nilai'] }}%</div>
-
-            <div class="progress">
-              <div class="progress-bar progress-green" role="progressbar" style="width: {{ $bidang['nilai'] }}%"></div>
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Performa Terendah</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                </div>
+                <h3 class="stat-value">{{ $worstPerformer['nama'] }}</h3>
+                <p class="stat-description">{{ $worstPerformer['nilai'] }}% pencapaian</p>
             </div>
-
-            <canvas id="bidangTerbaikChart{{ $index }}" style="max-height: 120px;"></canvas>
-          </div>
-          @endforeach
         </div>
-      </div>
-
-      <!-- Tab Bidang Terendah -->
-      <div class="tab-pane fade" id="terendah-bidang" role="tabpanel">
-        <div class="bidang-grid">
-          @foreach($bidangData->where('nilai', '<', 70)->take(6) as $index => $bidang)
-          <div class="bidang-card">
-            <h3 class="bidang-title">{{ $bidang['nama'] }}</h3>
-            <div class="bidang-value">{{ $bidang['nilai'] }}%</div>
-
-            @php
-              $progressClass = 'progress-red';
-              if ($bidang['nilai'] >= 50) {
-                $progressClass = 'progress-yellow';
-              }
-            @endphp
-            <div class="progress">
-              <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $bidang['nilai'] }}%"></div>
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Rata-rata Pencapaian</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+                @php
+                    $avgValue = $bidangData->avg('nilai');
+                @endphp
+                <h3 class="stat-value">{{ number_format($avgValue, 2) }}%</h3>
+                <p class="stat-description">Seluruh bidang</p>
             </div>
-
-            <canvas id="bidangTerendahChart{{ $index }}" style="max-height: 120px;"></canvas>
-          </div>
-          @endforeach
         </div>
-      </div>
+        <div class="dashboard-col">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h2 class="stat-title">Total Bidang</h2>
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                </div>
+                <h3 class="stat-value">{{ $bidangData->count() }}</h3>
+                <p class="stat-description">Jumlah bidang dalam organisasi</p>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Row 2: Chart dan Notifikasi -->
+    <div class="row mt-4">
+        <div class="col-md-7">
+            <div class="chart-container">
+                <h2 class="chart-title">Pencapaian Per-Bidang</h2>
+                <canvas id="bidangChart" height="250"></canvas>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <i class="fas fa-bell mr-2"></i>
+                    Notifikasi Terbaru
+                </h2>
+
+                @if($latestNotifications->count() > 0)
+                    <div class="notification-list">
+                        @foreach($latestNotifications as $notification)
+                            <div class="notification-item">
+                                <div class="notification-icon bg-{{ $notification->jenis }}">
+                                    <i class="fas fa-{{ $notification->jenis == 'info' ? 'info-circle' : ($notification->jenis == 'success' ? 'check-circle' : 'exclamation-circle') }}"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h4 class="notification-title">{{ $notification->judul }}</h4>
+                                    <p class="notification-message">{{ $notification->pesan }}</p>
+                                    <div class="notification-time">{{ $notification->created_at->diffForHumans() }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('notifikasi.index') }}" class="btn btn-action">Lihat Semua Notifikasi</a>
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash empty-icon"></i>
+                        <p>Tidak ada notifikasi baru</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Perubahan Bulanan & Indikator Terbaik -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <i class="fas fa-exchange-alt mr-2"></i>
+                    Perubahan dari Bulan Lalu
+                </h2>
+
+                <div class="change-list">
+                    @foreach($monthlyChange as $change)
+                        <div class="change-item">
+                            <div class="change-bidang">{{ $change['nama'] }}</div>
+                            <div class="change-values">
+                                <div class="change-current">{{ $change['current'] }}%</div>
+                                <div class="change-arrow {{ $change['change'] >= 0 ? 'positive' : 'negative' }}">
+                                    <i class="fas fa-{{ $change['change'] >= 0 ? 'arrow-up' : 'arrow-down' }}"></i>
+                                </div>
+                                <div class="change-previous">{{ $change['previous'] }}%</div>
+                            </div>
+                            <div class="change-diff {{ $change['change'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                {{ $change['change'] >= 0 ? '+' : '' }}{{ $change['change'] }}%
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar {{ $change['change'] >= 0 ? 'progress-green' : 'progress-red' }}"
+                                    style="width: {{ min(100, abs($change['change'])) }}%"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <h2 class="card-title">
+                    <i class="fas fa-star mr-2"></i>
+                    Indikator dengan Kinerja Terbaik
+                </h2>
+
+                <div class="best-list">
+                    @foreach($bestIndikators as $indikator)
+                        <div class="best-item">
+                            <div class="best-badge">{{ $indikator->persentase }}%</div>
+                            <div class="best-content">
+                                <h4 class="best-title">{{ $indikator->indikator->kode }} - {{ $indikator->indikator->nama }}</h4>
+                                <p class="best-bidang">{{ $indikator->indikator->bidang->nama }}</p>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-green"
+                                    style="width: {{ $indikator->persentase }}%"></div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Tabel Bidang -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="dashboard-card">
+                <h2 class="card-title">Ringkasan Kinerja Seluruh Bidang</h2>
+
+                <div class="bidang-grid-container">
+                    <div class="bidang-grid">
+                        @foreach ($bidangData as $bidang)
+                            <div class="bidang-card">
+                                <div class="bidang-header">
+                                    <h3 class="bidang-title">{{ $bidang['nama'] }}</h3>
+                                    <div class="badge {{ $bidang['nilai'] < 70 ? 'bg-danger' : ($bidang['nilai'] < 90 ? 'bg-warning' : 'bg-success') }}">
+                                        {{ $bidang['nilai'] }}%
+                                    </div>
+                                </div>
+
+                                <div class="bidang-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar {{ $bidang['nilai'] < 70 ? 'progress-red' : ($bidang['nilai'] < 90 ? 'progress-yellow' : 'progress-green') }}"
+                                            style="width: {{ $bidang['nilai'] }}%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="bidang-status">
+                                    @if($bidang['nilai'] >= 90)
+                                        <span class="status status-success">Sangat Baik</span>
+                                    @elseif($bidang['nilai'] >= 80)
+                                        <span class="status status-good">Baik</span>
+                                    @elseif($bidang['nilai'] >= 70)
+                                        <span class="status status-medium">Cukup</span>
+                                    @else
+                                        <span class="status status-poor">Kurang</span>
+                                    @endif
+                                </div>
+
+                                <div class="bidang-actions">
+                                    <a href="{{ route('dataKinerja.bidang', array_search($bidang['nama'], array_column(App\Models\Bidang::all()->toArray(), 'nama')) + 1) }}" class="btn btn-action btn-sm">
+                                        <i class="fas fa-chart-bar"></i> Detail
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Gauge Chart
-    const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
-    const nkoValue = {{ number_format($rataRataNKO, 1) }};
-
-    // Determine color based on value
-    let gaugeColor = '#F44336'; // Red for low values
-    if (nkoValue >= 70) {
-      gaugeColor = '#4CAF50'; // Green for high values
-    } else if (nkoValue >= 50) {
-      gaugeColor = '#FFC107'; // Yellow for medium values
-    }
-
-    // Konfigurasi chart dengan pengaturan kinerja tinggi
-    Chart.defaults.elements.point.radius = 0; // Mengurangi penggunaan titik yang memberatkan
-    Chart.defaults.elements.line.borderWidth = 2; // Mengurangi ketebalan garis
-    Chart.defaults.font.size = 11; // Ukuran font lebih kecil
-    Chart.defaults.animation.duration = 400; // Animasi lebih cepat
-
-    new Chart(gaugeCtx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [nkoValue, 100 - nkoValue],
-          backgroundColor: [
-            gaugeColor,
-            'rgba(200, 200, 200, 0.1)'
-          ],
-          borderWidth: 0,
-          circumference: 180,
-          rotation: 270,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        cutout: '70%',
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            enabled: false
-          }
-        },
-        animation: {
-          animateRotate: true,
-          animateScale: false
-        }
-      }
-    });
-
-    // Bidang Comparison Chart - dengan lazy loading
-    setTimeout(() => {
-      const bidangCtx = document.getElementById('bidangChart').getContext('2d');
-      const bidangData = @json($bidangData);
-
-      new Chart(bidangCtx, {
-        type: 'bar',
-        data: {
-          labels: bidangData.map(item => item.nama),
-          datasets: [{
-            label: 'Nilai Kinerja',
-            data: bidangData.map(item => item.nilai),
-            backgroundColor: bidangData.map(item => {
-              const value = item.nilai;
-              if (value >= 70) return 'rgba(76, 175, 80, 0.7)';
-              else if (value >= 50) return 'rgba(255, 193, 7, 0.7)';
-              else return 'rgba(244, 67, 54, 0.7)';
-            }),
-            borderColor: bidangData.map(item => {
-              const value = item.nilai;
-              if (value >= 70) return '#4CAF50';
-              else if (value >= 50) return '#FFC107';
-              else return '#F44336';
-            }),
-            borderWidth: 1,
-            borderRadius: 5,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              display: false
+    document.addEventListener('DOMContentLoaded', function() {
+        // Bidang Chart
+        const bidangChart = new Chart(document.getElementById('bidangChart'), {
+            type: 'bar',
+            data: {
+                labels: [
+                    @foreach($bidangData as $bidang)
+                        '{{ $bidang['nama'] }}',
+                    @endforeach
+                ],
+                datasets: [{
+                    label: 'Pencapaian KPI (%)',
+                    data: [
+                        @foreach($bidangData as $bidang)
+                            {{ $bidang['nilai'] }},
+                        @endforeach
+                    ],
+                    backgroundColor: [
+                        @foreach($bidangData as $bidang)
+                            '{{ $bidang['nilai'] < 70 ? 'rgba(244, 67, 54, 0.7)' : ($bidang['nilai'] < 90 ? 'rgba(255, 193, 7, 0.7)' : 'rgba(76, 175, 80, 0.7)') }}',
+                        @endforeach
+                    ],
+                    borderColor: [
+                        @foreach($bidangData as $bidang)
+                            '{{ $bidang['nilai'] < 70 ? 'rgba(244, 67, 54, 1)' : ($bidang['nilai'] < 90 ? 'rgba(255, 193, 7, 1)' : 'rgba(76, 175, 80, 1)') }}',
+                        @endforeach
+                    ],
+                    borderWidth: 1
+                }]
             },
-            tooltip: {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              titleColor: '#fff',
-              bodyColor: '#fff',
-              titleFont: {
-                size: 13,
-                weight: 'bold'
-              },
-              bodyFont: {
-                size: 12
-              },
-              padding: 10,
-              displayColors: false,
-              callbacks: {
-                label: function(context) {
-                  return context.parsed.y + '%';
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
                 }
-              }
             }
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false
-              },
-              ticks: {
-                color: 'var(--pln-text-secondary)',
-                autoSkip: true,
-                maxRotation: 45,
-                minRotation: 45
-              }
-            },
-            y: {
-              beginAtZero: true,
-              max: 100,
-              grid: {
-                color: 'rgba(255, 255, 255, 0.05)'
-              },
-              ticks: {
-                color: 'var(--pln-text-secondary)',
-                stepSize: 25,
-                callback: function(value) {
-                  return value + '%';
-                }
-              }
-            }
-          },
-          animation: {
-            duration: 500
-          }
-        }
-      });
-    }, 300); // Delay untuk mengurangi beban rendering awal
-
-    // Fungsi untuk membuat detail chart yang dioptimalkan
-    function createBidangDetailChart(chartId, bidangNilai) {
-      if (!document.getElementById(chartId)) return;
-
-      const bidangDetailCtx = document.getElementById(chartId).getContext('2d');
-      const monthlyData = generateMonthlyData(bidangNilai);
-
-      new Chart(bidangDetailCtx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-          datasets: [{
-            label: 'Tren Nilai',
-            data: monthlyData,
-            backgroundColor: 'rgba(0, 156, 222, 0.1)',
-            borderColor: '#009cde',
-            borderWidth: 1.5,
-            pointRadius: 0,
-            pointHoverRadius: 3,
-            tension: 0.3,
-            fill: true
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              display: false
-            },
-            tooltip: {
-              enabled: false
-            }
-          },
-          scales: {
-            x: {
-              display: false
-            },
-            y: {
-              display: false,
-              beginAtZero: true,
-              max: 100
-            }
-          },
-          elements: {
-            line: {
-              tension: 0.3
-            }
-          },
-          animation: {
-            duration: 300
-          }
-        }
-      });
-    }
-
-    // Delay chart rendering untuk tab pertama (aktif)
-    setTimeout(() => {
-      // Untuk tab semua bidang (hanya render 6 pertama)
-      @foreach($bidangData->take(6) as $index => $bidang)
-        createBidangDetailChart(`bidangDetailChart{{ $index }}`, {{ $bidang['nilai'] }});
-      @endforeach
-    }, 500);
-
-    // Lazy loading untuk tab lainnya - hanya render ketika tab diklik
-    $('#bidangTabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      const target = $(e.target).attr("href");
-
-      if (target === '#terbaik-bidang') {
-        // Render charts untuk tab bidang terbaik
-        @foreach($bidangData->where('nilai', '>=', 80)->take(6) as $index => $bidang)
-          createBidangDetailChart(`bidangTerbaikChart{{ $index }}`, {{ $bidang['nilai'] }});
-        @endforeach
-      }
-      else if (target === '#terendah-bidang') {
-        // Render charts untuk tab bidang terendah
-        @foreach($bidangData->where('nilai', '<', 70)->take(6) as $index => $bidang)
-          createBidangDetailChart(`bidangTerendahChart{{ $index }}`, {{ $bidang['nilai'] }});
-        @endforeach
-      }
-    });
-
-    // Fungsi untuk menghasilkan data bulanan (lebih sederhana)
-    function generateMonthlyData(finalValue) {
-      const data = [];
-      const min = Math.max(finalValue - 20, 0);
-
-      // Kurangi jumlah iterasi untuk meningkatkan performa
-      for (let i = 0; i < 5; i++) {
-        data.push(Math.floor(min + (Math.random() * 20)));
-      }
-
-      // Tambahkan nilai akhir sebagai data bulan terakhir
-      data.push(finalValue);
-
-      return data;
-    }
-
-    // Animate progress bars dengan transisi lebih cepat
-    const progressBars = document.querySelectorAll('.progress-bar');
-    setTimeout(() => {
-      progressBars.forEach(bar => {
-        bar.style.width = bar.getAttribute('style').replace('width: ', '');
-      });
-    }, 200);
-
-    // Pagination dengan event handler yang lebih ringan
-    document.querySelectorAll('.pagination a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.querySelectorAll('.pagination a.active').forEach(item => {
-          item.classList.remove('active');
         });
-        this.classList.add('active');
-      });
     });
-  });
 </script>
 @endsection

@@ -42,17 +42,52 @@ class TargetKinerjaController extends Controller
         }
 
         if (!$tahunPenilaian) {
-            $tahunPenilaian = TahunPenilaian::where('is_active', true)->first();
+            // Coba cari tahun penilaian aktif
+            $tahunPenilaian = TahunPenilaian::where('is_aktif', true)->first();
+
+            // Jika masih tidak ditemukan, coba cari tahun penilaian terbaru
             if (!$tahunPenilaian) {
-                return redirect()->route('tahunPenilaian.index')->with('error', 'Tidak ada tahun penilaian aktif. Silakan aktifkan tahun penilaian terlebih dahulu.');
+                $tahunPenilaian = TahunPenilaian::orderBy('tahun', 'desc')->first();
+
+                // Jika sama sekali tidak ada tahun penilaian, tampilkan halaman target kinerja dengan pesan
+                if (!$tahunPenilaian) {
+                    // Jika user adalah master admin
+                    if ($user->isMasterAdmin()) {
+                        // Tampilkan halaman kosong dengan pesan error
+                        $pilars = collect([]);
+                        $totalIndikators = 0;
+                        session()->flash('error', 'Tidak ada tahun penilaian yang tersedia. Silakan buat tahun penilaian terlebih dahulu.');
+                        return view('targetKinerja.index', compact('pilars', 'tahunPenilaian', 'totalIndikators'));
+                    } else {
+                        // Jika user admin bidang, tampilkan halaman kosong dengan pesan error
+                        $bidang = $user->getBidang();
+                        if (!$bidang) {
+                            return redirect()->route('dashboard')->with('error', 'Bidang tidak ditemukan untuk admin ini.');
+                        }
+                        $indikators = collect([]);
+                        session()->flash('error', 'Tidak ada tahun penilaian yang tersedia. Silakan hubungi administrator.');
+                        return view('targetKinerja.index_admin', compact('indikators', 'bidang', 'tahunPenilaian'));
+                    }
+                }
+
+                // Tampilkan peringatan bahwa tidak ada tahun aktif
+                session()->flash('warning', 'Tidak ada tahun penilaian aktif. Menggunakan tahun penilaian terbaru (' . $tahunPenilaian->tahun . ').');
             }
         }
 
         // Jika user adalah master admin, ambil semua indikator
         if ($user->isMasterAdmin()) {
-            $pilars = Pilar::with(['indikators' => function($query) {
-                $query->where('aktif', true)->orderBy('kode');
-            }])->orderBy('urutan')->get();
+            // Ambil semua pilar dengan relasinya dalam satu query
+            $pilars = Pilar::with([
+                'indikators' => function($query) {
+                    $query->with('bidang')->orderBy('kode');
+                }
+            ])->orderBy('urutan')->get();
+
+            // Cek apakah pilars tidak kosong
+            if ($pilars->isEmpty()) {
+                return redirect()->route('dashboard')->with('error', 'Data pilar belum tersedia. Silakan hubungi administrator.');
+            }
 
             // Tambahkan data target ke tiap indikator
             foreach ($pilars as $pilar) {
@@ -62,7 +97,16 @@ class TargetKinerjaController extends Controller
                 }
             }
 
-            return view('targetKinerja.index', compact('pilars', 'tahunPenilaian'));
+            // Hitung total indikator untuk memastikan semua data diambil
+            $totalIndikators = $pilars->sum(function($pilar) {
+                return $pilar->indikators->count();
+            });
+
+            // Log untuk debugging
+            \Log::info("Total Pilar: " . $pilars->count());
+            \Log::info("Total Indikator: " . $totalIndikators);
+
+            return view('targetKinerja.index', compact('pilars', 'tahunPenilaian', 'totalIndikators'));
         }
 
         // Jika user adalah admin bidang, hanya ambil indikator di bidangnya
@@ -73,7 +117,6 @@ class TargetKinerjaController extends Controller
             }
 
             $indikators = Indikator::where('bidang_id', $bidang->id)
-                ->where('aktif', true)
                 ->orderBy('kode')
                 ->get();
 

@@ -662,7 +662,7 @@ use Illuminate\Support\Str;
 
         {{-- Menu untuk semua user --}}
         <li>
-          <a href="{{ route('kpi.history') }}" class="{{ request()->routeIs('kpi.history') ? 'active' : '' }}">
+          <a href="{{ route('kpi.index') }}" class="{{ request()->routeIs('kpi.index') ? 'active' : '' }}">
             <i class="fas fa-history icon"></i>
             <span class="menu-text">Riwayat KPI</span>
           </a>

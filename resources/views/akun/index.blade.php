@@ -804,6 +804,10 @@
                     @enderror
                 </div>
                 <div class="user-detail-item">
+                    <span class="user-detail-label"><i class="fas fa-lock me-2"></i>Konfirmasi Password</span>
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="Masukkan ulang password" required>
+                </div>
+                <div class="user-detail-item">
                     <span class="user-detail-label"><i class="fas fa-user-tag me-2"></i>Peran</span>
                     <select name="role" class="form-control form-select" required>
                         <option value="">-- Pilih Peran --</option>
@@ -876,7 +880,7 @@
 
         // Set URL form action
         const form = document.getElementById('editForm');
-        form.action = "{{ route('akun.update', '') }}/" + userId;
+        form.action = "{{ route('akun.update', ':id') }}".replace(':id', userId);
 
         // Tampilkan modal dengan animasi
         const modal = document.getElementById('editModal');
@@ -894,7 +898,7 @@
 
         // Set URL form action
         const form = document.getElementById('deleteForm');
-        form.action = "{{ route('akun.destroy', '') }}/" + userId;
+        form.action = "{{ route('akun.destroy', ':id') }}".replace(':id', userId);
 
         // Tampilkan modal dengan animasi
         const modal = document.getElementById('deleteModal');

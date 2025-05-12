@@ -2,155 +2,669 @@
 
 @section('title', 'Data Target Kinerja')
 
+@section('styles')
+<style>
+    /* Main Container */
+    .dashboard-content {
+        max-width: 1800px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    /* Grid System */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .grid-span-3 {
+        grid-column: span 3;
+    }
+
+    .grid-span-4 {
+        grid-column: span 4;
+    }
+
+    .grid-span-6 {
+        grid-column: span 6;
+    }
+
+    .grid-span-8 {
+        grid-column: span 8;
+    }
+
+    .grid-span-12 {
+        grid-column: span 12;
+    }
+
+    /* Card Styling - Support Dark/Light Mode */
+    .stat-card {
+        background: var(--pln-accent-bg);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--pln-border);
+        box-shadow: 0 8px 20px var(--pln-shadow);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px var(--pln-shadow);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--pln-blue), var(--pln-light-blue));
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .stat-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--pln-text);
+        margin: 0;
+    }
+
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
+        color: white;
+        font-size: 20px;
+        box-shadow: 0 5px 15px rgba(0, 156, 222, 0.3);
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--pln-text);
+        margin: 15px 0 5px;
+    }
+
+    .stat-description {
+        font-size: 13px;
+        color: var(--pln-text-secondary);
+        margin: 0;
+    }
+
+    /* Card Pilar - Support Dark/Light Mode */
+    .pilar-card {
+        background: var(--pln-accent-bg);
+        border-radius: 16px;
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--pln-border);
+        box-shadow: 0 8px 20px var(--pln-shadow);
+        transition: all 0.3s ease;
+    }
+
+    .pilar-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px var(--pln-shadow);
+    }
+
+    .pilar-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--pln-blue), var(--pln-light-blue));
+    }
+
+    .pilar-card .card-header {
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
+        color: white;
+        border: none;
+        border-radius: 16px 16px 0 0;
+        padding: 15px 20px;
+    }
+
+    /* Table Styling - Support Dark/Light Mode */
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        color: var(--pln-text);
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--pln-border);
+    }
+
+    .data-table th {
+        background-color: var(--pln-accent-bg);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: var(--pln-text);
+    }
+
+    .data-table tbody tr:hover {
+        background-color: var(--pln-accent-bg);
+    }
+
+    /* Target Status - Support Dark/Light Mode */
+    .target-status {
+        display: flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 5px;
+    }
+
+    .target-status.approved {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+    }
+
+    .target-status.pending {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+
+    .target-status.missing {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+    }
+
+    .target-status i {
+        margin-right: 5px;
+    }
+
+    /* Target Button Groups */
+    .target-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .target-actions .btn {
+        border-radius: 50px;
+        padding: 5px 15px;
+        font-size: 0.75rem;
+    }
+
+    /* Tahun Selector - Support Dark/Light Mode */
+    .tahun-selector {
+        background-color: var(--pln-accent-bg);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 20px var(--pln-shadow);
+        margin-bottom: 20px;
+        color: var(--pln-text);
+        border: 1px solid var(--pln-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tahun-selector::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--pln-blue), var(--pln-light-blue));
+    }
+
+    .tahun-selector .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tahun-selector .btn {
+        border-radius: 50px;
+        padding: 8px 18px;
+    }
+
+    /* Monthly Target Preview */
+    .monthly-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+    }
+
+    .monthly-preview-item {
+        width: 22px;
+        height: 8px;
+        border-radius: 4px;
+        background-color: var(--pln-surface-2);
+    }
+
+    .monthly-preview-item.filled {
+        background-color: var(--pln-light-blue);
+    }
+
+    .section-divider {
+        display: flex;
+        align-items: center;
+        margin: 30px 0 20px;
+        color: var(--pln-light-blue);
+    }
+
+    .section-divider h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--pln-text);
+    }
+
+    .section-divider i {
+        margin-right: 10px;
+        color: var(--pln-light-blue);
+    }
+
+    /* Modal styling - Support Dark/Light Mode */
+    .modal-content {
+        background-color: var(--pln-accent-bg);
+        color: var(--pln-text);
+        border-radius: 16px;
+        border: 1px solid var(--pln-border);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--pln-border);
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--pln-border);
+    }
+
+    .table-bordered {
+        border-color: var(--pln-border);
+    }
+
+    .text-muted {
+        color: var(--pln-text-secondary) !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+
+        .grid-span-3,
+        .grid-span-4,
+        .grid-span-6,
+        .grid-span-8,
+        .grid-span-12 {
+            grid-column: span 1;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container-fluid">
+<div class="dashboard-content">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Data Target Kinerja</h1>
+        @if($tahunPenilaian)
+        <div class="badge badge-primary p-2">
+            <i class="fas fa-info-circle"></i> Total Indikator: {{ $totalIndikators ?? $pilars->sum(function($pilar) { return $pilar->indikators->count(); }) }}
+        </div>
+        @endif
     </div>
 
     @include('components.alert')
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Target KPI Tahun {{ $tahunPenilaian->tahun }}</h6>
+    @if(!$tahunPenilaian)
+    <!-- Pesan tidak ada tahun penilaian -->
+    <div class="alert alert-info shadow-sm border-left-info">
+        <div class="d-flex align-items-center">
+            <div class="mr-3">
+                <i class="fas fa-calendar-alt fa-2x text-info"></i>
+            </div>
             <div>
-                <div class="dropdown d-inline-block mr-2">
-                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="tahunDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Tahun Penilaian
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="tahunDropdown">
-                        @foreach(\App\Models\TahunPenilaian::orderBy('tahun', 'desc')->get() as $tp)
-                            <a class="dropdown-item {{ $tp->id == $tahunPenilaian->id ? 'active' : '' }}"
-                               href="{{ route('targetKinerja.index', ['tahun_penilaian_id' => $tp->id]) }}">
-                                {{ $tp->tahun }} {{ $tp->is_active ? '(Aktif)' : '' }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
+                <h5 class="font-weight-bold mb-1">Tidak Ada Tahun Penilaian</h5>
+                <p class="mb-0">Tidak ada tahun penilaian yang tersedia. Silakan buat tahun penilaian terlebih dahulu untuk melanjutkan.</p>
             </div>
         </div>
-        <div class="card-body">
+        <div class="mt-3">
+            <a href="{{ route('tahunPenilaian.create') }}" class="btn btn-info btn-sm">
+                <i class="fas fa-plus-circle mr-1"></i> Buat Tahun Penilaian Baru
+            </a>
+            <a href="{{ route('tahunPenilaian.index') }}" class="btn btn-outline-secondary btn-sm ml-2">
+                <i class="fas fa-list mr-1"></i> Lihat Daftar Tahun Penilaian
+            </a>
+        </div>
+    </div>
+    @else
+    <!-- Tahun Selector -->
+    <div class="tahun-selector">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 font-weight-bold">Tahun Penilaian: {{ $tahunPenilaian->tahun }}</h5>
+
             @if($tahunPenilaian->is_locked)
-                <div class="alert alert-warning">
-                    <i class="fas fa-lock mr-2"></i> Tahun penilaian ini telah dikunci. Data target tidak dapat diubah.
-                </div>
+            <div class="badge badge-warning p-2">
+                <i class="fas fa-lock"></i> Tahun Terkunci
+            </div>
             @endif
+        </div>
 
-            <div class="accordion" id="pilarAccordion">
-                @foreach($pilars as $pilar)
-                    <div class="card mb-2">
-                        <div class="card-header bg-gradient-primary text-white" id="heading{{ $pilar->id }}">
-                            <h2 class="mb-0">
-                                <button class="btn btn-link text-white text-decoration-none w-100 text-left" type="button"
-                                        data-toggle="collapse" data-target="#collapse{{ $pilar->id }}"
-                                        aria-expanded="true" aria-controls="collapse{{ $pilar->id }}">
-                                    <strong>{{ $pilar->kode }} - {{ $pilar->nama }}</strong>
-                                </button>
-                            </h2>
-                        </div>
+        <div class="btn-group">
+            @foreach(\App\Models\TahunPenilaian::orderBy('tahun', 'desc')->get() as $tp)
+                <a href="{{ route('targetKinerja.index', ['tahun_penilaian_id' => $tp->id]) }}"
+                   class="btn {{ $tp->id == $tahunPenilaian->id ? 'btn-primary' : 'btn-outline-primary' }}">
+                    {{ $tp->tahun }}
+                    @if($tp->is_aktif)
+                        <i class="fas fa-star-of-life ml-1" data-toggle="tooltip" title="Tahun Aktif"></i>
+                    @endif
+                </a>
+            @endforeach
+        </div>
+    </div>
 
-                        <div id="collapse{{ $pilar->id }}" class="collapse"
-                             aria-labelledby="heading{{ $pilar->id }}" data-parent="#pilarAccordion">
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover mb-0">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th width="5%">No</th>
-                                                <th width="10%">Kode</th>
-                                                <th width="30%">Indikator</th>
-                                                <th width="10%">Bobot</th>
-                                                <th width="15%">Target Tahunan</th>
-                                                <th width="10%">Status</th>
-                                                <th width="20%">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($pilar->indikators->where('aktif', true) as $index => $indikator)
-                                                <tr>
-                                                    <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $indikator->kode }}</td>
-                                                    <td>
-                                                        <strong>{{ $indikator->nama }}</strong>
-                                                        @if($indikator->deskripsi)
-                                                            <div class="small text-muted">{{ $indikator->deskripsi }}</div>
-                                                        @endif
-                                                        <div class="badge badge-info">{{ $indikator->bidang->nama }}</div>
-                                                    </td>
-                                                    <td>{{ $indikator->bobot }}%</td>
-                                                    <td>
-                                                        @if(isset($indikator->target_data))
-                                                            {{ number_format($indikator->target_data->target_tahunan, 2) }}
-                                                        @else
-                                                            <span class="text-danger">Belum Diatur</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if(isset($indikator->target_data))
-                                                            @if($indikator->target_data->disetujui)
-                                                                <span class="badge badge-success">Disetujui</span>
-                                                            @else
-                                                                <span class="badge badge-warning">Menunggu Persetujuan</span>
-                                                            @endif
-                                                        @else
-                                                            <span class="badge badge-danger">Belum Diatur</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if(!$tahunPenilaian->is_locked)
-                                                            @if(isset($indikator->target_data))
-                                                                <a href="{{ route('targetKinerja.edit', $indikator->target_data->id) }}"
-                                                                   class="btn btn-sm btn-info">
-                                                                    <i class="fas fa-edit"></i> Edit
-                                                                </a>
+    <!-- Dashboard Stats -->
+    <div class="dashboard-grid">
+        <!-- Total Indikator -->
+        <div class="grid-span-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-title">Total Indikator</div>
+                <div class="stat-value">{{ $pilars->sum(function($pilar) { return $pilar->indikators->count(); }) }}</div>
+                <div class="stat-description">Jumlah indikator</div>
+            </div>
+        </div>
 
-                                                                @if(!$indikator->target_data->disetujui)
-                                                                    <a href="{{ route('targetKinerja.approve', $indikator->target_data->id) }}"
-                                                                       class="btn btn-sm btn-success">
-                                                                        <i class="fas fa-check"></i> Setujui
-                                                                    </a>
-                                                                @else
-                                                                    <a href="{{ route('targetKinerja.unapprove', $indikator->target_data->id) }}"
-                                                                       class="btn btn-sm btn-warning">
-                                                                        <i class="fas fa-times"></i> Batal Setujui
-                                                                    </a>
-                                                                @endif
-                                                            @else
-                                                                <a href="{{ route('targetKinerja.create', ['indikator_id' => $indikator->id, 'tahun_penilaian_id' => $tahunPenilaian->id]) }}"
-                                                                   class="btn btn-sm btn-primary">
-                                                                    <i class="fas fa-plus"></i> Tambah Target
-                                                                </a>
-                                                            @endif
-                                                        @else
-                                                            <button class="btn btn-sm btn-secondary" disabled>
-                                                                <i class="fas fa-lock"></i> Terkunci
-                                                            </button>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="7" class="text-center">Tidak ada indikator aktif untuk pilar ini</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+        <!-- Target Disetujui -->
+        <div class="grid-span-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-title">Target Disetujui</div>
+                <div class="stat-value">
+                    @php
+                        $totalApproved = 0;
+                        foreach($pilars as $pilar) {
+                            foreach($pilar->indikators as $indikator) {
+                                if(isset($indikator->target_data) && $indikator->target_data->disetujui) {
+                                    $totalApproved++;
+                                }
+                            }
+                        }
+                        echo $totalApproved;
+                    @endphp
+                </div>
+                <div class="stat-description">Indikator dengan target disetujui</div>
+            </div>
+        </div>
+
+        <!-- Menunggu Persetujuan -->
+        <div class="grid-span-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-title">Menunggu Persetujuan</div>
+                <div class="stat-value">
+                    @php
+                        $totalPending = 0;
+                        foreach($pilars as $pilar) {
+                            foreach($pilar->indikators as $indikator) {
+                                if(isset($indikator->target_data) && !$indikator->target_data->disetujui) {
+                                    $totalPending++;
+                                }
+                            }
+                        }
+                        echo $totalPending;
+                    @endphp
+                </div>
+                <div class="stat-description">Indikator menunggu persetujuan</div>
+            </div>
+        </div>
+
+        <!-- Belum Diatur -->
+        <div class="grid-span-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-title">Belum Diatur</div>
+                <div class="stat-value">
+                    @php
+                        $totalMissing = 0;
+                        foreach($pilars as $pilar) {
+                            foreach($pilar->indikators as $indikator) {
+                                if(!isset($indikator->target_data)) {
+                                    $totalMissing++;
+                                }
+                            }
+                        }
+                        echo $totalMissing;
+                    @endphp
+                </div>
+                <div class="stat-description">Indikator tanpa target</div>
             </div>
         </div>
     </div>
+
+    <!-- Accordion Pilar -->
+    <div class="section-divider mb-4">
+        <h2><i class="fas fa-layer-group"></i> Target Per-Pilar</h2>
+    </div>
+
+    <!-- Tampilkan semua pilar secara berurutan -->
+    @foreach($pilars as $index => $pilar)
+        <div class="pilar-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="m-0"><strong>{{ $pilar->kode }}</strong> - {{ $pilar->nama }}
+                    <span class="badge badge-light ml-2">{{ $pilar->indikators->count() }} indikator</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th width="5%">No</th>
+                                <th width="10%">Kode</th>
+                                <th width="25%">Indikator</th>
+                                <th width="8%">Bobot</th>
+                                <th width="15%">Target Tahunan</th>
+                                <th width="15%">Target Bulanan</th>
+                                <th width="10%">Status</th>
+                                <th width="15%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($pilar->indikators as $indIndex => $indikator)
+                                <tr>
+                                    <td>{{ $indIndex + 1 }}</td>
+                                    <td><strong>{{ $indikator->kode }}</strong></td>
+                                    <td>
+                                        <strong>{{ $indikator->nama }}</strong>
+                                        @if($indikator->deskripsi)
+                                            <div class="small text-muted">{{ Str::limit($indikator->deskripsi, 60) }}</div>
+                                        @endif
+                                        <div class="badge badge-info">{{ $indikator->bidang->nama }}</div>
+                                        @if(!$indikator->aktif)
+                                            <div class="badge badge-warning">Tidak Aktif</div>
+                                        @endif
+                                    </td>
+                                    <td>{{ $indikator->bobot }}%</td>
+                                    <td>
+                                        @if(isset($indikator->target_data))
+                                            <span class="font-weight-bold">{{ number_format($indikator->target_data->target_tahunan, 2) }}</span>
+                                        @else
+                                            <span class="text-danger">Belum Diatur</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($indikator->target_data) && is_array($indikator->target_data->target_bulanan))
+                                            <div class="monthly-preview">
+                                                @php
+                                                    $bulanan = $indikator->target_data->target_bulanan;
+                                                    $max = count($bulanan) > 0 ? max($bulanan) : 0;
+                                                @endphp
+                                                @foreach($bulanan as $bulan)
+                                                    <div class="monthly-preview-item filled" style="height: {{ $max > 0 ? (4 + ($bulan/$max * 8)) : 4 }}px"></div>
+                                                @endforeach
+                                            </div>
+                                            <div class="small text-muted mt-1">
+                                                <i class="fas fa-info-circle"></i>
+                                                <a href="#" data-toggle="modal" data-target="#monthlyModal{{ $indikator->id }}">
+                                                    Lihat detail
+                                                </a>
+                                            </div>
+
+                                            <!-- Modal Target Bulanan -->
+                                            <div class="modal fade" id="monthlyModal{{ $indikator->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Target Bulanan: {{ $indikator->kode }}</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-bordered">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Bulan</th>
+                                                                            <th>Target</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach($bulanan as $index => $nilai)
+                                                                            <tr>
+                                                                                <td>{{ \Carbon\Carbon::create(null, $index+1, 1)->locale('id')->monthName }}</td>
+                                                                                <td>{{ number_format($nilai, 2) }}</td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="monthly-preview">
+                                                @for($i = 0; $i < 12; $i++)
+                                                    <div class="monthly-preview-item"></div>
+                                                @endfor
+                                            </div>
+                                            <div class="small text-muted mt-1">
+                                                <i class="fas fa-minus-circle"></i> Belum diatur
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($indikator->target_data))
+                                            @if($indikator->target_data->disetujui)
+                                                <div class="target-status approved">
+                                                    <i class="fas fa-check-circle"></i> Disetujui
+                                                </div>
+                                            @else
+                                                <div class="target-status pending">
+                                                    <i class="fas fa-clock"></i> Menunggu
+                                                </div>
+                                            @endif
+                                        @else
+                                            <div class="target-status missing">
+                                                <i class="fas fa-exclamation-circle"></i> Belum Ada
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(!$tahunPenilaian->is_locked)
+                                            <div class="target-actions">
+                                                @if(isset($indikator->target_data))
+                                                    <a href="{{ route('targetKinerja.edit', $indikator->target_data->id) }}"
+                                                       class="btn btn-sm btn-info">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+
+                                                    @if(!$indikator->target_data->disetujui)
+                                                        <a href="{{ route('targetKinerja.approve', $indikator->target_data->id) }}"
+                                                           class="btn btn-sm btn-success">
+                                                            <i class="fas fa-check"></i> Setujui
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('targetKinerja.unapprove', $indikator->target_data->id) }}"
+                                                           class="btn btn-sm btn-warning">
+                                                            <i class="fas fa-times"></i> Batal
+                                                        </a>
+                                                    @endif
+                                                @else
+                                                    <a href="{{ route('targetKinerja.create', ['indikator_id' => $indikator->id, 'tahun_penilaian_id' => $tahunPenilaian->id]) }}"
+                                                       class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-plus"></i> Tambah Target
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                <i class="fas fa-lock"></i> Terkunci
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="8" class="text-center">Tidak ada indikator untuk pilar ini</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    @endif
 </div>
 @endsection
 
 @section('scripts')
 <script>
     $(document).ready(function() {
-        // Buka collapse pertama secara default
-        $('#pilarAccordion .collapse:first').addClass('show');
+        console.log('Document ready!');
+
+        // Initialize tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Tambahkan ID ke setiap pilar card untuk navigasi
+        $('.card').each(function(index) {
+            var pilarCode = $(this).find('.card-header strong').text();
+            if (pilarCode) {
+                $(this).attr('id', 'pilar-' + pilarCode);
+            }
+        });
     });
 </script>
 @endsection
