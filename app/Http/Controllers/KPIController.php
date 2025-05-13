@@ -71,7 +71,7 @@ class KPIController extends Controller
                 }
             }
 
-            return view('kpi.index', compact('pilars', 'tahun', 'bulan', 'periodeTipe'));
+            return view('kpi.index', compact('pilars', 'tahun', 'bulan', 'periodeTipe', 'request'));
         }
 
         // Jika admin, dapatkan indikator untuk bidangnya
@@ -100,7 +100,7 @@ class KPIController extends Controller
                 $indikator->diverifikasi = $nilaiKPI ? $nilaiKPI->diverifikasi : false;
             }
 
-            return view('kpi.admin_index', compact('bidang', 'indikators', 'tahun', 'bulan', 'periodeTipe'));
+            return view('kpi.admin_index', compact('bidang', 'indikators', 'tahun', 'bulan', 'periodeTipe', 'request'));
         }
 
         // Jika karyawan, dapatkan ringkasan
@@ -129,6 +129,12 @@ class KPIController extends Controller
                 'nama' => $bidang->nama,
                 'nilai' => $rataRata,
             ];
+        }
+
+        // Pastikan bidangData selalu berupa array biasa, bukan collection
+        if (!is_array($bidangData)) {
+            $bidangData = is_object($bidangData) && method_exists($bidangData, 'toArray') ?
+                $bidangData->toArray() : (array)$bidangData;
         }
 
         return view('kpi.user_index', compact('bidangData', 'tahun', 'bulan', 'periodeTipe'));
@@ -436,9 +442,15 @@ class KPIController extends Controller
     {
         $user = Auth::user();
         $tahun = $request->tahun ?? date('Y');
+        $indikatorId = $request->indikator_id;
 
         // Simpan dalam histori pencarian
         $this->logHistoriPencarian($user, 'history_kpi', 'Mengakses riwayat KPI tahun ' . $tahun);
+
+        // Jika ada indikator spesifik yang diminta
+        if ($indikatorId) {
+            return $this->detailRiwayat($request, $indikatorId);
+        }
 
         if ($user->isMasterAdmin()) {
             // Master admin bisa melihat semua data
@@ -448,14 +460,17 @@ class KPIController extends Controller
 
             foreach ($pilars as $pilar) {
                 foreach ($pilar->indikators as $indikator) {
-                    $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
+                    $indikator->historiData = collect($this->getIndikatorHistoriData($indikator->id, $tahun));
                 }
             }
 
             // Tambahkan statistics data untuk dashboard
             $statistics = $this->getHistoryStatistics($pilars, $tahun);
 
-            return view('kpi.history', compact('pilars', 'tahun', 'statistics'));
+            // Pastikan tidak ada collection di dalam statistics untuk mencegah error
+            $statistics = $this->ensureStatisticsArray($statistics);
+
+            return view('kpi.history', compact('pilars', 'tahun', 'statistics', 'request'));
         } elseif ($user->isAdmin()) {
             // Admin hanya bisa melihat data bidangnya
             $bidang = $user->getBidang();
@@ -470,11 +485,14 @@ class KPIController extends Controller
                 ->get();
 
             foreach ($indikators as $indikator) {
-                $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
+                $indikator->historiData = collect($this->getIndikatorHistoriData($indikator->id, $tahun));
             }
 
             // Tambahkan statistics data untuk dashboard
             $statistics = $this->getIndikatorStatistics($indikators, $tahun, $bidang->nama);
+
+            // Pastikan tidak ada collection di dalam statistics untuk mencegah error
+            $statistics = $this->ensureStatisticsArray($statistics);
 
             // Buat struktur data yang sama dengan view master admin
             $pilars = collect([
@@ -485,7 +503,7 @@ class KPIController extends Controller
                 ]
             ]);
 
-            return view('kpi.history', compact('pilars', 'tahun', 'statistics'));
+            return view('kpi.history', compact('pilars', 'tahun', 'statistics', 'request'));
         } else {
             // Karyawan hanya bisa melihat ringkasan
             $bidangs = Bidang::all();
@@ -498,7 +516,7 @@ class KPIController extends Controller
                     ->get();
 
                 foreach ($indikators as $indikator) {
-                    $indikator->historiData = $this->getIndikatorHistoriData($indikator->id, $tahun);
+                    $indikator->historiData = collect($this->getIndikatorHistoriData($indikator->id, $tahun));
                 }
 
                 // Tambahkan sebagai pilar agar struktur data konsisten dengan view
@@ -512,9 +530,13 @@ class KPIController extends Controller
             }
 
             // Tambahkan statistics data untuk dashboard
+            // Ubah dari array menjadi collection agar bisa menggunakan fungsi avg()
             $statistics = $this->getAllBidangStatistics($pilars, $tahun);
 
-            return view('kpi.history', compact('pilars', 'tahun', 'statistics'));
+            // Pastikan tidak ada collection di dalam statistics untuk mencegah error
+            $statistics = $this->ensureStatisticsArray($statistics);
+
+            return view('kpi.history', compact('pilars', 'tahun', 'statistics', 'request'));
         }
     }
 
@@ -537,7 +559,14 @@ class KPIController extends Controller
                 $indikatorNilai = 0;
                 $indikatorCount = 0;
 
-                foreach ($indikator->historiData as $data) {
+                // Pastikan historiData adalah collection
+                $historiData = $indikator->historiData;
+                if (!is_object($historiData) || !method_exists($historiData, 'avg')) {
+                    $historiData = collect($historiData);
+                    $indikator->historiData = $historiData;
+                }
+
+                foreach ($historiData as $data) {
                     if ($data['nilai'] > 0) {
                         $indikatorNilai += $data['nilai'];
                         $indikatorCount++;
@@ -579,6 +608,11 @@ class KPIController extends Controller
      */
     private function getIndikatorStatistics($indikators, $tahun, $bidangNama)
     {
+        // Pastikan indikators adalah collection, bukan array
+        if (is_array($indikators)) {
+            $indikators = collect($indikators);
+        }
+
         $totalIndikator = $indikators->count();
         $totalTercapai = 0;
         $totalDiverifikasi = 0;
@@ -589,7 +623,14 @@ class KPIController extends Controller
         foreach ($indikators as $indikator) {
             $indikatorTercapai = false;
 
-            foreach ($indikator->historiData as $data) {
+            // Pastikan historiData adalah collection
+            $historiData = $indikator->historiData;
+            if (!is_object($historiData) || !method_exists($historiData, 'avg')) {
+                $historiData = collect($historiData);
+                $indikator->historiData = $historiData;
+            }
+
+            foreach ($historiData as $data) {
                 if ($data['nilai'] > 0) {
                     $totalNilai += $data['nilai'];
                     $totalData++;
@@ -628,7 +669,7 @@ class KPIController extends Controller
      */
     private function getAllBidangStatistics($pilars, $tahun)
     {
-        $statistik = [];
+        $statistik = collect([]); // Ubah array menjadi collection
         $totalIndikator = 0;
         $totalTercapai = 0;
         $totalDiverifikasi = 0;
@@ -636,8 +677,13 @@ class KPIController extends Controller
         $totalData = 0;
 
         foreach ($pilars as $pilar) {
+            // Pastikan indikators adalah collection, bukan array
+            if (is_array($pilar->indikators)) {
+                $pilar->indikators = collect($pilar->indikators);
+            }
+
             $bidangStat = $this->getIndikatorStatistics($pilar->indikators, $tahun, $pilar->nama);
-            $statistik[] = $bidangStat;
+            $statistik->push($bidangStat); // Push ke collection bukan array
 
             $totalIndikator += $bidangStat['total_indikator'];
             $totalTercapai += $bidangStat['indikator_tercapai'];
@@ -650,8 +696,9 @@ class KPIController extends Controller
         $persentaseTercapai = $totalIndikator > 0 ? round(($totalTercapai / $totalIndikator) * 100, 2) : 0;
         $persentaseDiverifikasi = $totalIndikator > 0 ? round(($totalDiverifikasi / $totalIndikator) * 100, 2) : 0;
 
+        // Ubah hasil menjadi array asosiatif untuk diakses di view
         return [
-            'bidang_stats' => $statistik,
+            'bidang_stats' => $statistik->toArray(), // Convert collection ke array
             'total_indikator' => $totalIndikator,
             'indikator_tercapai' => $totalTercapai,
             'persentase_tercapai' => $persentaseTercapai,
@@ -701,7 +748,7 @@ class KPIController extends Controller
             ];
         }
 
-        return $data;
+        return $data; // Data akan diubah menjadi collection pada tempat penggunaan
     }
 
     /**
@@ -1004,5 +1051,50 @@ class KPIController extends Controller
         );
 
         return redirect()->back()->with('success', 'Nilai KPI berhasil difinalisasi untuk riwayat');
+    }
+
+    /**
+     * Pastikan semua koleksi dalam statistics array sudah dikonversi menjadi array biasa
+     * untuk mencegah error pada view
+     */
+    private function ensureStatisticsArray($statistics)
+    {
+        // Jika statistics bukan array, konversi menjadi array
+        if (!is_array($statistics)) {
+            $statistics = is_object($statistics) && method_exists($statistics, 'toArray')
+                ? $statistics->toArray()
+                : (array) $statistics;
+        }
+
+        // Konversi bidang_stats menjadi array jika ada
+        if (isset($statistics['bidang_stats'])) {
+            if (is_object($statistics['bidang_stats']) && method_exists($statistics['bidang_stats'], 'toArray')) {
+                $statistics['bidang_stats'] = $statistics['bidang_stats']->toArray();
+            } elseif (!is_array($statistics['bidang_stats'])) {
+                $statistics['bidang_stats'] = (array) $statistics['bidang_stats'];
+            }
+
+            // Konversi setiap item dalam bidang_stats menjadi array
+            foreach ($statistics['bidang_stats'] as $key => $value) {
+                if (is_object($value) && method_exists($value, 'toArray')) {
+                    $statistics['bidang_stats'][$key] = $value->toArray();
+                } elseif (!is_array($value)) {
+                    $statistics['bidang_stats'][$key] = (array) $value;
+                }
+            }
+        }
+
+        // Periksa dan konversi field lain yang mungkin merupakan collection
+        foreach ($statistics as $key => $value) {
+            if ($key !== 'bidang_stats') { // bidang_stats sudah diproses di atas
+                if (is_object($value) && method_exists($value, 'toArray')) {
+                    $statistics[$key] = $value->toArray();
+                } elseif (is_object($value)) {
+                    $statistics[$key] = (array) $value;
+                }
+            }
+        }
+
+        return $statistics;
     }
 }

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Tambah Target Kinerja')
+@section('page_title', 'TAMBAH TARGET KINERJA')
 
 @section('styles')
 <style>
@@ -11,24 +12,56 @@
         padding: 0 15px;
     }
 
+    /* Page Header - Modern UI */
+    .page-header {
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
+        color: white;
+        border-radius: 12px;
+        padding: 20px 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .page-header-subtitle {
+        margin-top: 5px;
+        font-weight: 400;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .page-header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
     /* Card Styling - Support Dark/Light Mode */
     .form-card {
-        border-radius: 8px;
-        box-shadow: 0 4px 10px var(--pln-shadow);
+        border-radius: 16px;
+        box-shadow: 0 8px 20px var(--pln-shadow);
         background-color: var(--pln-surface);
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         overflow: hidden;
         color: var(--pln-text);
     }
 
     .form-card .card-header {
-        background: var(--pln-header-bg);
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
         color: white;
         padding: 15px 20px;
         font-weight: 600;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        border: none;
     }
 
     .form-card .card-body {
@@ -39,14 +72,15 @@
     .info-box {
         background-color: var(--pln-accent-bg);
         border-left: 4px solid var(--pln-light-blue);
-        border-radius: 4px;
-        padding: 15px;
-        margin-bottom: 20px;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
     }
 
     .info-box h6 {
-        color: var(--pln-light-blue);
+        color: var(--pln-blue);
         margin-bottom: 15px;
+        font-weight: 600;
     }
 
     .info-row {
@@ -69,13 +103,13 @@
     .form-group label {
         font-weight: 600;
         color: var(--pln-text);
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .form-control {
-        border-radius: 4px;
+        border-radius: 8px;
         border: 1px solid var(--pln-border);
-        padding: 10px 15px;
+        padding: 12px 15px;
         font-size: 0.875rem;
         background-color: var(--pln-surface);
         color: var(--pln-text);
@@ -84,7 +118,7 @@
 
     .form-control:focus {
         border-color: var(--pln-light-blue);
-        box-shadow: 0 0 0 0.2rem rgba(0, 156, 222, 0.25);
+        box-shadow: 0 0 0 0.25rem rgba(0, 156, 222, 0.25);
         background-color: var(--pln-surface);
         color: var(--pln-text);
     }
@@ -114,7 +148,7 @@
         margin-top: 30px;
         display: flex;
         justify-content: center;
-        gap: 10px;
+        gap: 15px;
     }
 
     .btn-action {
@@ -138,11 +172,11 @@
 
     /* Target Graphic - Support Dark/Light Mode */
     .target-visual {
-        height: 40px;
-        background: var(--pln-surface-2);
-        border-radius: 4px;
+        height: 50px;
+        background: var(--pln-accent-bg);
+        border-radius: 8px;
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         border: 1px solid var(--pln-border);
         overflow: hidden;
     }
@@ -152,13 +186,13 @@
         left: 0;
         top: 0;
         height: 100%;
-        background: var(--pln-light-blue);
+        background: linear-gradient(90deg, var(--pln-blue), var(--pln-light-blue));
         transition: width 0.5s ease;
     }
 
     .target-value {
         position: absolute;
-        right: 10px;
+        right: 15px;
         top: 50%;
         transform: translateY(-50%);
         font-weight: bold;
@@ -169,21 +203,29 @@
     /* Alert Styles - Support Dark/Light Mode */
     .alert-custom {
         border-radius: 8px;
-        padding: 15px;
+        padding: 15px 20px;
         margin-bottom: 20px;
         border-left: 4px solid;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .alert-custom i {
+        margin-right: 10px;
+        font-size: 1.1rem;
+        margin-top: 2px;
     }
 
     .alert-custom.alert-warning {
         background-color: rgba(255, 193, 7, 0.15);
         border-color: #ffc107;
-        color: #ffc107;
+        color: var(--pln-text);
     }
 
     .alert-custom.alert-info {
         background-color: rgba(23, 162, 184, 0.15);
         border-color: #17a2b8;
-        color: #17a2b8;
+        color: var(--pln-text);
     }
 
     /* Text-muted - Support Dark/Light Mode */
@@ -191,10 +233,28 @@
         color: var(--pln-text-secondary) !important;
     }
 
+    /* Form control help text */
+    .form-text {
+        margin-top: 5px;
+        font-size: 0.8rem;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .monthly-grid {
             grid-template-columns: repeat(2, 1fr);
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .page-header-actions {
+            width: 100%;
+            justify-content: flex-start;
+            margin-top: 10px;
         }
     }
 
@@ -212,11 +272,19 @@
 
 @section('content')
 <div class="dashboard-content">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Tambah Target Kinerja</h1>
-        <a href="{{ route('targetKinerja.index', ['tahun_penilaian_id' => $tahunPenilaian->id]) }}" class="btn btn-sm btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
+    <!-- Modern Page Header -->
+    <div class="page-header">
+        <div>
+            <h2><i class="fas fa-plus-circle me-2"></i>Tambah Target Kinerja</h2>
+            <div class="page-header-subtitle">
+                Tentukan target tahunan dan bulanan untuk indikator kinerja
+            </div>
+        </div>
+        <div class="page-header-actions">
+            <a href="{{ route('targetKinerja.index', ['tahun_penilaian_id' => $tahunPenilaian->id]) }}" class="btn btn-light">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
     </div>
 
     @include('components.alert')
@@ -227,7 +295,7 @@
         </div>
         <div class="card-body">
             <div class="info-box mb-4">
-                <h6 class="font-weight-bold">Informasi Indikator</h6>
+                <h6><i class="fas fa-info-circle me-2"></i>Informasi Indikator</h6>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="info-row">
@@ -280,7 +348,7 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="form-text text-muted">
-                        Masukkan target tahunan untuk indikator ini.
+                        <i class="fas fa-info-circle me-1"></i> Masukkan target tahunan untuk indikator ini.
                     </small>
                 </div>
 
@@ -292,8 +360,8 @@
                 <div class="form-group">
                     <label>Target Bulanan</label>
                     <div class="alert-custom alert-info">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Jika target bulanan tidak diisi, maka target tahunan akan dibagi rata ke 12 bulan.
+                        <i class="fas fa-info-circle"></i>
+                        <div>Jika target bulanan tidak diisi, maka target tahunan akan dibagi rata ke 12 bulan.</div>
                     </div>
 
                     <div class="monthly-grid">
@@ -327,7 +395,7 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                     <small class="form-text text-muted">
-                        Tambahkan keterangan jika diperlukan.
+                        <i class="fas fa-edit me-1"></i> Tambahkan keterangan jika diperlukan.
                     </small>
                 </div>
 
@@ -335,6 +403,9 @@
                     <button type="submit" class="btn btn-primary btn-action">
                         <i class="fas fa-save"></i> Simpan Target
                     </button>
+                    <a href="{{ route('targetKinerja.index', ['tahun_penilaian_id' => $tahunPenilaian->id]) }}" class="btn btn-secondary btn-action">
+                        <i class="fas fa-times"></i> Batal
+                    </a>
                 </div>
             </form>
         </div>

@@ -780,7 +780,8 @@
                     </div>
                 </div>
                 @php
-                    $avgValue = $bidangData->avg('nilai');
+                    $nilaiArray = array_column($bidangData, 'nilai');
+                    $avgValue = count($nilaiArray) > 0 ? array_sum($nilaiArray) / count($nilaiArray) : 0;
                 @endphp
                 <h3 class="stat-value">{{ number_format($avgValue, 2) }}%</h3>
                 <p class="stat-description">Seluruh bidang</p>
@@ -794,7 +795,7 @@
                         <i class="fas fa-building"></i>
                     </div>
                 </div>
-                <h3 class="stat-value">{{ $bidangData->count() }}</h3>
+                <h3 class="stat-value">{{ count($bidangData) }}</h3>
                 <p class="stat-description">Jumlah bidang dalam organisasi</p>
             </div>
         </div>

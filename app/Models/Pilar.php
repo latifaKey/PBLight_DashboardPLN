@@ -27,6 +27,14 @@ class Pilar extends Model
     }
 
     /**
+     * Alias untuk indikators() untuk backward compatibility
+     */
+    public function indikator(): HasMany
+    {
+        return $this->indikators();
+    }
+
+    /**
      * Mendapatkan total nilai pilar berdasarkan indikator-indikatornya
      *
      * @param int $tahun

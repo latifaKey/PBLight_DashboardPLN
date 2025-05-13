@@ -143,7 +143,26 @@ class RealisasiController extends Controller
         }
 
         // Hitung persentase pencapaian
-        $persentase = min(100, ($request->nilai / $indikator->target) * 100);
+        if ($indikator->target > 0) {
+            $persentase = min(100, ($request->nilai / $indikator->target) * 100);
+        } else {
+            // Jika target nol, set persentase ke 0 untuk menghindari division by zero
+            $persentase = 0;
+            \Log::warning('Target indikator bernilai nol', [
+                'indikator_id' => $indikator->id,
+                'indikator_nama' => $indikator->nama
+            ]);
+        }
+
+        // Debug statement - tambahkan log untuk melihat data yang dikirimkan
+        \Log::info('Saving KPI value', [
+            'user_id' => $user->id,
+            'indikator_id' => $request->indikator_id,
+            'nilai' => $request->nilai,
+            'tahun' => $request->tahun,
+            'bulan' => $request->bulan,
+            'persentase' => $persentase
+        ]);
 
         // Cek apakah sudah ada nilai untuk periode ini
         $existing = NilaiKPI::where('indikator_id', $request->indikator_id)
@@ -159,90 +178,102 @@ class RealisasiController extends Controller
 
         $existingData = $existing->first();
 
-        if ($existingData) {
-            // Update nilai yang sudah ada
-            $existingData->update([
-                'nilai' => $request->nilai,
-                'persentase' => $persentase,
-                'keterangan' => $request->keterangan,
-                'user_id' => $user->id,
-                'diverifikasi' => false,
-                'verifikasi_oleh' => null,
-                'verifikasi_pada' => null,
-            ]);
-
-            // Catat log aktivitas
-            AktivitasLog::log(
-                $user,
-                'update',
-                'Mengupdate nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama,
-                [
-                    'indikator_id' => $indikator->id,
-                    'nilai_lama' => $existingData->getOriginal('nilai'),
-                    'nilai_baru' => $request->nilai,
-                    'tahun' => $request->tahun,
-                    'bulan' => $request->bulan,
-                ],
-                $request->ip(),
-                $request->userAgent()
-            );
-
-            // Kirim notifikasi ke Master Admin
-            Notifikasi::kirimKeMasterAdmin(
-                'Perbarui Nilai KPI',
-                'Nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama . ' telah diperbarui oleh ' . $user->name,
-                'warning',
-                route('kpi.verifikasi')
-            );
-
-            return redirect()->route('realisasi.index', [
-                'tahun' => $request->tahun,
-                'bulan' => $request->bulan,
-                'periode_tipe' => $request->periode_tipe
-            ])->with('success', 'Nilai KPI berhasil diperbarui.');
-        } else {
-            // Buat nilai baru
-            $nilaiKPI = NilaiKPI::create([
-                'indikator_id' => $request->indikator_id,
-                'user_id' => $user->id,
-                'tahun' => $request->tahun,
-                'bulan' => $request->bulan,
-                'minggu' => $request->minggu,
-                'periode_tipe' => $request->periode_tipe,
-                'nilai' => $request->nilai,
-                'persentase' => $persentase,
-                'keterangan' => $request->keterangan,
-                'diverifikasi' => false,
-            ]);
-
-            // Catat log aktivitas
-            AktivitasLog::log(
-                $user,
-                'create',
-                'Menambahkan nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama,
-                [
-                    'indikator_id' => $indikator->id,
+        try {
+            if ($existingData) {
+                // Update nilai yang sudah ada
+                $existingData->update([
                     'nilai' => $request->nilai,
+                    'persentase' => $persentase,
+                    'keterangan' => $request->keterangan,
+                    'user_id' => $user->id,
+                    'diverifikasi' => false,
+                    'verifikasi_oleh' => null,
+                    'verifikasi_pada' => null,
+                ]);
+
+                // Catat log aktivitas
+                AktivitasLog::log(
+                    $user,
+                    'update',
+                    'Mengupdate nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama,
+                    [
+                        'indikator_id' => $indikator->id,
+                        'nilai_lama' => $existingData->getOriginal('nilai'),
+                        'nilai_baru' => $request->nilai,
+                        'tahun' => $request->tahun,
+                        'bulan' => $request->bulan,
+                    ],
+                    $request->ip(),
+                    $request->userAgent()
+                );
+
+                // Kirim notifikasi ke Master Admin
+                Notifikasi::kirimKeMasterAdmin(
+                    'Perbarui Nilai KPI',
+                    'Nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama . ' telah diperbarui oleh ' . $user->name,
+                    'warning',
+                    route('kpi.verifikasi')
+                );
+
+                return redirect()->route('realisasi.index', [
                     'tahun' => $request->tahun,
                     'bulan' => $request->bulan,
-                ],
-                $request->ip(),
-                $request->userAgent()
-            );
+                    'periode_tipe' => $request->periode_tipe
+                ])->with('success', 'Nilai KPI berhasil diperbarui.');
+            } else {
+                // Buat nilai baru
+                $nilaiKPI = NilaiKPI::create([
+                    'indikator_id' => $request->indikator_id,
+                    'user_id' => $user->id,
+                    'tahun' => $request->tahun,
+                    'bulan' => $request->bulan,
+                    'minggu' => $request->minggu,
+                    'periode_tipe' => $request->periode_tipe,
+                    'nilai' => $request->nilai,
+                    'persentase' => $persentase,
+                    'keterangan' => $request->keterangan,
+                    'diverifikasi' => false,
+                ]);
 
-            // Kirim notifikasi ke Master Admin
-            Notifikasi::kirimKeMasterAdmin(
-                'Tambah Nilai KPI Baru',
-                'Nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama . ' telah ditambahkan oleh ' . $user->name,
-                'info',
-                route('kpi.verifikasi')
-            );
+                // Catat log aktivitas
+                AktivitasLog::log(
+                    $user,
+                    'create',
+                    'Menambahkan nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama,
+                    [
+                        'indikator_id' => $indikator->id,
+                        'nilai' => $request->nilai,
+                        'tahun' => $request->tahun,
+                        'bulan' => $request->bulan,
+                    ],
+                    $request->ip(),
+                    $request->userAgent()
+                );
 
-            return redirect()->route('realisasi.index', [
-                'tahun' => $request->tahun,
-                'bulan' => $request->bulan,
-                'periode_tipe' => $request->periode_tipe
-            ])->with('success', 'Nilai KPI berhasil disimpan.');
+                // Kirim notifikasi ke Master Admin
+                Notifikasi::kirimKeMasterAdmin(
+                    'Tambah Nilai KPI Baru',
+                    'Nilai KPI ' . $indikator->kode . ' - ' . $indikator->nama . ' telah ditambahkan oleh ' . $user->name,
+                    'info',
+                    route('kpi.verifikasi')
+                );
+
+                return redirect()->route('realisasi.index', [
+                    'tahun' => $request->tahun,
+                    'bulan' => $request->bulan,
+                    'periode_tipe' => $request->periode_tipe
+                ])->with('success', 'Nilai KPI berhasil disimpan.');
+            }
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Error saving KPI value', [
+                'message' => $e->getMessage(),
+                'user_id' => $user->id,
+                'indikator_id' => $request->indikator_id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
     }
 

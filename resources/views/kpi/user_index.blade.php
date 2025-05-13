@@ -34,7 +34,11 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h2 class="mb-0">{{ number_format($bidangData->avg('nilai'), 2) }}%</h2>
+                                    @php
+                                        $nilaiArray = array_column($bidangData, 'nilai');
+                                        $avgValue = count($nilaiArray) > 0 ? array_sum($nilaiArray) / count($nilaiArray) : 0;
+                                    @endphp
+                                    <h2 class="mb-0">{{ number_format($avgValue, 2) }}%</h2>
                                     <p class="text-muted">NKO Rata-rata</p>
                                 </div>
                                 <div>
@@ -51,7 +55,7 @@
                         </div>
                         <div class="card-body">
                             @php
-                                $bestBidang = $bidangData->sortByDesc('nilai')->first();
+                                $bestBidang = !empty($bidangData) ? collect($bidangData)->sortByDesc('nilai')->first() : null;
                             @endphp
                             @if($bestBidang)
                             <div class="d-flex justify-content-between align-items-center">
@@ -121,7 +125,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const avgValue = {{ $bidangData->avg('nilai') }};
+        @php
+            $nilaiArray = array_column($bidangData, 'nilai');
+            $avgValue = count($nilaiArray) > 0 ? array_sum($nilaiArray) / count($nilaiArray) : 0;
+        @endphp
+        const avgValue = {{ $avgValue }};
 
         // Determine color based on value
         let gaugeColor = '#F44336'; // Red for low values

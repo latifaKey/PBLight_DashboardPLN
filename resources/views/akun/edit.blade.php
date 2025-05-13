@@ -93,6 +93,11 @@
                    placeholder="Biarkan kosong jika tidak diubah">
         </div>
 
+        <div class="form-group">
+            <label for="password_confirmation">Konfirmasi Password</label>
+            <input type="password" id="password_confirmation" name="password_confirmation"
+                   placeholder="Biarkan kosong jika tidak diubah">
+        </div>
 
         <div class="form-group">
             <label for="role">Peran</label>
@@ -110,7 +115,6 @@
                 <option value="karyawan" {{ old('role', $user->role) == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
             </select>
         </div>
-
 
         <div class="form-actions">
             <button type="submit">Update</button>

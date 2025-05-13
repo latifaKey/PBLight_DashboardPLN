@@ -106,7 +106,20 @@ class User extends Authenticatable
             return collect();
         }
 
-        return $bidang->indikators;
+        return $bidang->indikators()->get();
+    }
+
+    /**
+     * Alias untuk getIndikators() (bentuk singular)
+     */
+    public function indikator()
+    {
+        $bidang = $this->getBidang();
+        if (!$bidang) {
+            return $this->hasMany(Indikator::class, 'id', 'id')->where('id', 0);
+        }
+
+        return $bidang->indikator();
     }
 
     /**

@@ -27,6 +27,14 @@ class Bidang extends Model
     }
 
     /**
+     * Alias untuk indikators() untuk backward compatibility
+     */
+    public function indikator(): HasMany
+    {
+        return $this->indikators();
+    }
+
+    /**
      * Mendapatkan PIC user dari bidang ini
      *
      * @return \App\Models\User|null

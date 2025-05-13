@@ -309,7 +309,7 @@ class DashboardController extends Controller
 
         // Dapatkan data ringkasan dari seluruh bidang
         $bidangs = Bidang::all();
-        $bidangData = collect([]);
+        $bidangData = [];  // Gunakan array biasa bukan collection
 
         foreach ($bidangs as $bidang) {
             $indikators = Indikator::where('bidang_id', $bidang->id)->where('aktif', true)->get();
@@ -327,10 +327,11 @@ class DashboardController extends Controller
 
             $rataRata = $indikators->count() > 0 ? round($totalNilai / $indikators->count(), 2) : 0;
 
-            $bidangData->push([
+            // Tambahkan ke array biasa
+            $bidangData[] = [
                 'nama' => $bidang->nama,
                 'nilai' => $rataRata
-            ]);
+            ];
         }
 
         // Integrasi dengan notifikasi - ambil notifikasi terbaru
@@ -339,9 +340,20 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Performa terbaik dan terendah
-        $bestPerformer = $bidangData->sortByDesc('nilai')->first();
-        $worstPerformer = $bidangData->sortBy('nilai')->first();
+        // Performa terbaik dan terendah menggunakan array biasa
+        // Urutkan array bidangData
+        usort($bidangData, function($a, $b) {
+            return $b['nilai'] <=> $a['nilai']; // Urutkan nilai dari besar ke kecil
+        });
+
+        $bestPerformer = !empty($bidangData) ? $bidangData[0] : ['nama' => 'Tidak ada data', 'nilai' => 0];
+
+        // Urutkan dari kecil ke besar untuk worst performer
+        usort($bidangData, function($a, $b) {
+            return $a['nilai'] <=> $b['nilai']; // Urutkan nilai dari kecil ke besar
+        });
+
+        $worstPerformer = !empty($bidangData) ? $bidangData[0] : ['nama' => 'Tidak ada data', 'nilai' => 0];
 
         // Data perubahan dari bulan sebelumnya
         $prevMonth = $bulan == 1 ? 12 : ($bulan - 1);

@@ -41,6 +41,14 @@ class Indikator extends Model
     }
 
     /**
+     * Self-referential method untuk mengatasi pemanggilan indikator() pada model Indikator
+     */
+    public function indikator(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'id', 'id');
+    }
+
+    /**
      * Mendapatkan semua nilai KPI untuk indikator ini
      */
     public function nilaiKPIs(): HasMany

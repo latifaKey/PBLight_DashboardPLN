@@ -878,9 +878,9 @@
         document.getElementById('editEmail').value = email;
         document.getElementById('editRole').value = role;
 
-        // Set URL form action
+        // Set URL form action - fixed to correctly pass the id
         const form = document.getElementById('editForm');
-        form.action = "{{ route('akun.update', ':id') }}".replace(':id', userId);
+        form.action = `/akun/${userId}`;
 
         // Tampilkan modal dengan animasi
         const modal = document.getElementById('editModal');
@@ -896,9 +896,9 @@
         // Set nama user yang akan dihapus
         document.getElementById('deleteUserName').textContent = userName;
 
-        // Set URL form action
+        // Set URL form action - fixed to correctly pass the id
         const form = document.getElementById('deleteForm');
-        form.action = "{{ route('akun.destroy', ':id') }}".replace(':id', userId);
+        form.action = `/akun/${userId}`;
 
         // Tampilkan modal dengan animasi
         const modal = document.getElementById('deleteModal');

@@ -533,35 +533,43 @@ use Illuminate\Support\Str;
       margin-bottom: 5px;
     }
 
-    /* Badge notifikasi */
+    /* Badge notifikasi - Improved */
     .notification-badge {
       display: none;
       position: absolute;
-      top: 8px;
+      top: 6px;
       right: 8px;
-      background-color: #e74c3c;
+      background: linear-gradient(135deg, #e74c3c, #ff6b6b);
       color: white;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       min-width: 20px;
       height: 20px;
-      border-radius: 10px;
+      border-radius: 50px;
       text-align: center;
       justify-content: center;
       align-items: center;
       font-weight: bold;
-      padding: 0 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 0 6px;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transform-origin: center center;
+      z-index: 5;
     }
 
-    /* Animasi badge */
+    /* Animasi badge - Enhanced */
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      0% { transform: scale(1); box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4); }
+      50% { transform: scale(1.2); box-shadow: 0 2px 12px rgba(231, 76, 60, 0.7); }
+      100% { transform: scale(1); box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4); }
     }
 
     .notification-badge:not(:empty) {
-      animation: pulse 2s infinite;
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Hover effect for notification menu item */
+    .sidebar-menu a:hover .notification-badge {
+      background: linear-gradient(135deg, #ff6b6b, #e74c3c);
     }
   </style>
   @yield('styles')

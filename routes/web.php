@@ -141,10 +141,8 @@ use App\Models\NilaiKPI;
             // Laporan KPI
             Route::get('/laporan', [KPIController::class, 'laporan'])->name('laporan');
 
-            // Riwayat KPI (redirect ke index untuk kompatibilitas)
-            Route::get('/history', function() {
-                return redirect()->route('kpi.index');
-            })->name('history');
+            // Riwayat KPI
+            Route::get('/history', [KPIController::class, 'history'])->name('history');
 
             Route::get('/history/export/excel', [KPIController::class, 'exportRiwayatToExcel'])->name('export.excel');
             Route::get('/history/export/pdf', [KPIController::class, 'exportRiwayatToPDF'])->name('export.pdf');

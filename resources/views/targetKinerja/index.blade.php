@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Data Target Kinerja')
+@section('title', 'Target Kinerja Bidang')
+@section('page_title', 'TARGET KINERJA BIDANG')
 
 @section('styles')
 <style>
@@ -9,6 +10,50 @@
         max-width: 1800px;
         margin: 0 auto;
         padding: 0 15px;
+    }
+
+    /* Page Header - Modern UI */
+    .page-header {
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
+        color: white;
+        border-radius: 12px;
+        padding: 20px 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .page-header-subtitle {
+        margin-top: 5px;
+        font-weight: 400;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .page-header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .page-header-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .page-header-badge i {
+        margin-right: 5px;
     }
 
     /* Grid System */
@@ -41,7 +86,7 @@
 
     /* Card Styling - Support Dark/Light Mode */
     .stat-card {
-        background: var(--pln-accent-bg);
+        background: var(--pln-surface);
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 25px;
@@ -109,7 +154,7 @@
 
     /* Card Pilar - Support Dark/Light Mode */
     .pilar-card {
-        background: var(--pln-accent-bg);
+        background: var(--pln-surface);
         border-radius: 16px;
         margin-bottom: 25px;
         position: relative;
@@ -178,6 +223,7 @@
         font-size: 0.75rem;
         font-weight: 600;
         margin-top: 5px;
+        white-space: nowrap;
     }
 
     .target-status.approved {
@@ -203,17 +249,19 @@
     .target-actions {
         display: flex;
         gap: 5px;
+        flex-wrap: wrap;
     }
 
     .target-actions .btn {
         border-radius: 50px;
         padding: 5px 15px;
         font-size: 0.75rem;
+        white-space: nowrap;
     }
 
     /* Tahun Selector - Support Dark/Light Mode */
     .tahun-selector {
-        background-color: var(--pln-accent-bg);
+        background-color: var(--pln-surface);
         border-radius: 16px;
         padding: 20px;
         box-shadow: 0 8px 20px var(--pln-shadow);
@@ -283,31 +331,42 @@
         color: var(--pln-light-blue);
     }
 
-    /* Modal styling - Support Dark/Light Mode */
-    .modal-content {
-        background-color: var(--pln-accent-bg);
-        color: var(--pln-text);
-        border-radius: 16px;
-        border: 1px solid var(--pln-border);
+    /* Alert Styles */
+    .alert-custom {
+        background-color: var(--pln-surface);
+        border-left: 4px solid;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 12px var(--pln-shadow);
     }
 
-    .modal-header {
-        border-bottom: 1px solid var(--pln-border);
+    .alert-custom .alert-icon {
+        font-size: 24px;
+        margin-right: 15px;
     }
 
-    .modal-footer {
-        border-top: 1px solid var(--pln-border);
+    .alert-custom.alert-info {
+        border-color: var(--pln-blue);
     }
 
-    .table-bordered {
-        border-color: var(--pln-border);
-    }
-
-    .text-muted {
-        color: var(--pln-text-secondary) !important;
+    .alert-custom.alert-info .alert-icon {
+        color: var(--pln-blue);
     }
 
     /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .grid-span-3 {
+            grid-column: span 3;
+        }
+    }
+
     @media (max-width: 768px) {
         .dashboard-grid {
             grid-template-columns: repeat(1, 1fr);
@@ -320,53 +379,83 @@
         .grid-span-12 {
             grid-column: span 1;
         }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .page-header-actions {
+            width: 100%;
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stat-card {
+            padding: 15px;
+        }
+
+        .tahun-selector .btn {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+        }
     }
 </style>
 @endsection
 
 @section('content')
 <div class="dashboard-content">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Data Target Kinerja</h1>
-        @if($tahunPenilaian)
-        <div class="badge badge-primary p-2">
-            <i class="fas fa-info-circle"></i> Total Indikator: {{ $totalIndikators ?? $pilars->sum(function($pilar) { return $pilar->indikators->count(); }) }}
+    <!-- Modern Page Header -->
+    <div class="page-header">
+        <div>
+            <h2><i class="fas fa-bullseye me-2"></i>Target Kinerja Bidang</h2>
+            <div class="page-header-subtitle">
+                Pengelolaan target dan evaluasi kinerja seluruh bidang
+            </div>
         </div>
-        @endif
+        <div class="page-header-actions">
+            @if($tahunPenilaian)
+            <div class="page-header-badge">
+                <i class="fas fa-chart-pie"></i>
+                Total Indikator: {{ $totalIndikators ?? $pilars->sum(function($pilar) { return $pilar->indikators->count(); }) }}
+            </div>
+            @endif
+        </div>
     </div>
 
     @include('components.alert')
 
     @if(!$tahunPenilaian)
-    <!-- Pesan tidak ada tahun penilaian -->
-    <div class="alert alert-info shadow-sm border-left-info">
-        <div class="d-flex align-items-center">
-            <div class="mr-3">
-                <i class="fas fa-calendar-alt fa-2x text-info"></i>
-            </div>
-            <div>
-                <h5 class="font-weight-bold mb-1">Tidak Ada Tahun Penilaian</h5>
-                <p class="mb-0">Tidak ada tahun penilaian yang tersedia. Silakan buat tahun penilaian terlebih dahulu untuk melanjutkan.</p>
-            </div>
+    <!-- Pesan tidak ada tahun penilaian - Dengan desain yang lebih modern -->
+    <div class="alert-custom alert-info">
+        <div class="alert-icon">
+            <i class="fas fa-calendar-alt"></i>
         </div>
-        <div class="mt-3">
-            <a href="{{ route('tahunPenilaian.create') }}" class="btn btn-info btn-sm">
-                <i class="fas fa-plus-circle mr-1"></i> Buat Tahun Penilaian Baru
-            </a>
-            <a href="{{ route('tahunPenilaian.index') }}" class="btn btn-outline-secondary btn-sm ml-2">
-                <i class="fas fa-list mr-1"></i> Lihat Daftar Tahun Penilaian
-            </a>
+        <div>
+            <h5 class="font-weight-bold mb-1">Tidak Ada Tahun Penilaian</h5>
+            <p class="mb-2">Tidak ada tahun penilaian yang tersedia. Silakan buat tahun penilaian terlebih dahulu untuk melanjutkan.</p>
+            <div class="mt-2">
+                <a href="{{ route('tahunPenilaian.create') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-circle me-1"></i> Buat Tahun Penilaian Baru
+                </a>
+                <a href="{{ route('tahunPenilaian.index') }}" class="btn btn-outline-secondary btn-sm ms-2">
+                    <i class="fas fa-list me-1"></i> Lihat Daftar Tahun Penilaian
+                </a>
+            </div>
         </div>
     </div>
     @else
-    <!-- Tahun Selector -->
+    <!-- Tahun Selector dengan tampilan yang lebih modern -->
     <div class="tahun-selector">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 font-weight-bold">Tahun Penilaian: {{ $tahunPenilaian->tahun }}</h5>
+            <h5 class="m-0 font-weight-bold"><i class="fas fa-calendar-alt me-2"></i>Tahun Penilaian: {{ $tahunPenilaian->tahun }}</h5>
 
             @if($tahunPenilaian->is_locked)
-            <div class="badge badge-warning p-2">
-                <i class="fas fa-lock"></i> Tahun Terkunci
+            <div class="badge bg-warning p-2 rounded-pill">
+                <i class="fas fa-lock me-1"></i> Tahun Terkunci
             </div>
             @endif
         </div>
@@ -377,14 +466,14 @@
                    class="btn {{ $tp->id == $tahunPenilaian->id ? 'btn-primary' : 'btn-outline-primary' }}">
                     {{ $tp->tahun }}
                     @if($tp->is_aktif)
-                        <i class="fas fa-star-of-life ml-1" data-toggle="tooltip" title="Tahun Aktif"></i>
+                        <i class="fas fa-star ms-1" data-bs-toggle="tooltip" title="Tahun Aktif"></i>
                     @endif
                 </a>
             @endforeach
         </div>
     </div>
 
-    <!-- Dashboard Stats -->
+    <!-- Dashboard Stats dengan card yang lebih modern -->
     <div class="dashboard-grid">
         <!-- Total Indikator -->
         <div class="grid-span-3">
@@ -394,7 +483,7 @@
                 </div>
                 <div class="stat-title">Total Indikator</div>
                 <div class="stat-value">{{ $pilars->sum(function($pilar) { return $pilar->indikators->count(); }) }}</div>
-                <div class="stat-description">Jumlah indikator</div>
+                <div class="stat-description">Jumlah indikator yang perlu ditargetkan</div>
             </div>
         </div>
 
@@ -471,17 +560,17 @@
         </div>
     </div>
 
-    <!-- Accordion Pilar -->
+    <!-- Accordion Pilar dengan desain yang lebih modern -->
     <div class="section-divider mb-4">
         <h2><i class="fas fa-layer-group"></i> Target Per-Pilar</h2>
     </div>
 
-    <!-- Tampilkan semua pilar secara berurutan -->
+    <!-- Tampilkan semua pilar secara berurutan dengan desain kartu yang lebih modern -->
     @foreach($pilars as $index => $pilar)
-        <div class="pilar-card mb-4">
+        <div class="pilar-card mb-4" id="pilar-{{ $pilar->kode }}">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="m-0"><strong>{{ $pilar->kode }}</strong> - {{ $pilar->nama }}
-                    <span class="badge badge-light ml-2">{{ $pilar->indikators->count() }} indikator</span>
+                    <span class="badge bg-light text-dark ms-2">{{ $pilar->indikators->count() }} indikator</span>
                 </h5>
             </div>
             <div class="card-body p-0">
@@ -509,9 +598,9 @@
                                         @if($indikator->deskripsi)
                                             <div class="small text-muted">{{ Str::limit($indikator->deskripsi, 60) }}</div>
                                         @endif
-                                        <div class="badge badge-info">{{ $indikator->bidang->nama }}</div>
+                                        <div class="badge bg-info rounded-pill">{{ $indikator->bidang->nama }}</div>
                                         @if(!$indikator->aktif)
-                                            <div class="badge badge-warning">Tidak Aktif</div>
+                                            <div class="badge bg-warning rounded-pill">Tidak Aktif</div>
                                         @endif
                                     </td>
                                     <td>{{ $indikator->bobot }}%</td>
@@ -535,20 +624,18 @@
                                             </div>
                                             <div class="small text-muted mt-1">
                                                 <i class="fas fa-info-circle"></i>
-                                                <a href="#" data-toggle="modal" data-target="#monthlyModal{{ $indikator->id }}">
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#monthlyModal{{ $indikator->id }}">
                                                     Lihat detail
                                                 </a>
                                             </div>
 
                                             <!-- Modal Target Bulanan -->
-                                            <div class="modal fade" id="monthlyModal{{ $indikator->id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal fade" id="monthlyModal{{ $indikator->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Target Bulanan: {{ $indikator->kode }}</h5>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="table-responsive">
@@ -656,10 +743,10 @@
         console.log('Document ready!');
 
         // Initialize tooltips
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-bs-toggle="tooltip"]').tooltip();
 
         // Tambahkan ID ke setiap pilar card untuk navigasi
-        $('.card').each(function(index) {
+        $('.pilar-card').each(function(index) {
             var pilarCode = $(this).find('.card-header strong').text();
             if (pilarCode) {
                 $(this).attr('id', 'pilar-' + pilarCode);
