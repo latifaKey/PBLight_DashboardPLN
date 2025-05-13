@@ -23,6 +23,18 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        animation: slideInDown 0.5s ease-out;
+    }
+
+    @keyframes slideInDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 
     .page-header h2 {
@@ -65,6 +77,18 @@
         overflow: hidden;
         border: 1px solid var(--pln-border);
         box-shadow: 0 8px 20px var(--pln-shadow);
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .notif-card::before {
@@ -99,10 +123,31 @@
     .notif-item {
         padding: 15px 20px;
         border-bottom: 1px solid var(--pln-border);
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+        animation: fadeInRight 0.5s ease-out;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .notif-item:nth-child(odd) {
+        animation-delay: 0.1s;
+    }
+
+    .notif-item:nth-child(even) {
+        animation-delay: 0.2s;
     }
 
     .notif-item:last-child {
@@ -111,12 +156,31 @@
 
     .notif-item:hover {
         background-color: var(--pln-accent-bg);
+        transform: translateX(5px);
+        box-shadow: -5px 0 10px rgba(0, 0, 0, 0.05);
     }
 
     .notif-item.unread {
         background-color: rgba(0, 123, 255, 0.05);
         border-left: 4px solid var(--pln-blue);
         padding-left: 16px;
+    }
+
+    .notif-item.unread::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: var(--pln-blue);
+        animation: pulseHighlight 2s infinite;
+    }
+
+    @keyframes pulseHighlight {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
     }
 
     .notif-content {
@@ -167,8 +231,39 @@
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        transition: all 0.2s;
+        transition: all 0.3s;
         white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-action::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
+    }
+
+    .btn-action:hover::after {
+        animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+        0% {
+            transform: scale(0, 0);
+            opacity: 0.5;
+        }
+        100% {
+            transform: scale(20, 20);
+            opacity: 0;
+        }
     }
 
     .btn-action i {
@@ -184,6 +279,18 @@
         padding: 30px 20px;
         text-align: center;
         color: var(--pln-text-secondary);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .no-notif i {
@@ -191,6 +298,13 @@
         color: var(--pln-light-blue);
         margin-bottom: 15px;
         opacity: 0.6;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
     }
 
     /* Pagination Styling */
@@ -316,64 +430,182 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Mark all as read
-        document.getElementById('markAllRead').addEventListener('click', function() {
-            if(confirm('Tandai semua notifikasi sebagai dibaca?')) {
-                fetch('{{ route("notifikasi.tandaiSemuaDibaca") }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => response.json())
-                .then(data => {
-                    if(data.success) {
-                        window.location.reload();
+        // Animasi notifikasi dengan efek expand/collapse
+        const notifItems = document.querySelectorAll('.notif-item');
+        notifItems.forEach(item => {
+            const message = item.querySelector('.notif-message');
+            const originalText = message.textContent;
+
+            // Jika pesan lebih dari 100 karakter, tambahkan expand/collapse
+            if (originalText.length > 100) {
+                const shortText = originalText.substring(0, 100) + '...';
+                message.textContent = shortText;
+
+                // Tambahkan tombol expand
+                const expandBtn = document.createElement('button');
+                expandBtn.className = 'btn btn-sm btn-light expand-btn';
+                expandBtn.innerHTML = '<i class="fas fa-angle-down"></i> Selengkapnya';
+                expandBtn.style.marginLeft = '5px';
+                expandBtn.style.fontSize = '0.75rem';
+                expandBtn.style.padding = '2px 8px';
+                expandBtn.style.borderRadius = '50px';
+
+                message.parentNode.insertBefore(expandBtn, message.nextSibling);
+
+                // Toggle expand/collapse dengan animasi
+                expandBtn.addEventListener('click', function() {
+                    if (message.textContent === shortText) {
+                        message.style.maxHeight = '0';
+                        setTimeout(() => {
+                            message.textContent = originalText;
+                            message.classList.add('animate__animated', 'animate__fadeIn');
+                            message.style.maxHeight = 'none';
+                            expandBtn.innerHTML = '<i class="fas fa-angle-up"></i> Sembunyikan';
+                        }, 200);
+                    } else {
+                        message.style.maxHeight = '0';
+                        setTimeout(() => {
+                            message.textContent = shortText;
+                            message.classList.add('animate__animated', 'animate__fadeIn');
+                            message.style.maxHeight = 'none';
+                            expandBtn.innerHTML = '<i class="fas fa-angle-down"></i> Selengkapnya';
+                        }, 200);
                     }
                 });
             }
         });
 
-        // Delete all read notifications
-        document.getElementById('deleteRead').addEventListener('click', function() {
-            if(confirm('Hapus semua notifikasi yang sudah dibaca?')) {
-                fetch('{{ route("notifikasi.hapusSudahDibaca") }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => response.json())
-                .then(data => {
-                    if(data.success) {
-                        window.location.reload();
-                    }
-                });
-            }
+        // Mark all as read dengan animasi
+        document.getElementById('markAllRead').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Ganti konfirmasi standar dengan SweetAlert
+            window.confirmAlert(
+                'Tandai Semua Dibaca?',
+                'Semua notifikasi akan ditandai sebagai telah dibaca.',
+                'Ya, Tandai Semua'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    // Tambahkan animasi ke notifikasi unread sebelum reload
+                    document.querySelectorAll('.notif-item.unread').forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('animate__animated', 'animate__fadeOutLeft');
+                            setTimeout(() => {
+                                item.classList.remove('unread');
+                                item.classList.remove('animate__fadeOutLeft');
+                                item.classList.add('animate__fadeInRight');
+                            }, 500);
+                        }, index * 100);
+                    });
+
+                    // Kirim request ke server
+                    setTimeout(() => {
+                        fetch('{{ route("notifikasi.tandaiSemuaDibaca") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                window.successAlert('Berhasil!', 'Semua notifikasi ditandai sebagai dibaca');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500);
+                            }
+                        });
+                    }, 800);
+                }
+            });
         });
 
-        // Mark individual notification as read
+        // Delete all read notifications dengan animasi
+        document.getElementById('deleteRead').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Ganti konfirmasi standar dengan SweetAlert
+            window.deleteConfirm(
+                'Hapus Notifikasi Dibaca?',
+                'Semua notifikasi yang sudah dibaca akan dihapus permanen.'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    // Tambahkan animasi ke notifikasi yang akan dihapus
+                    document.querySelectorAll('.notif-item:not(.unread)').forEach((item, index) => {
+                        setTimeout(() => {
+                            item.classList.add('animate__animated', 'animate__zoomOut');
+                        }, index * 100);
+                    });
+
+                    // Kirim request ke server
+                    setTimeout(() => {
+                        fetch('{{ route("notifikasi.hapusSudahDibaca") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                window.successAlert('Berhasil!', 'Notifikasi yang sudah dibaca telah dihapus');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500);
+                            }
+                        });
+                    }, 800);
+                }
+            });
+        });
+
+        // Mark individual notification as read dengan animasi
         document.querySelectorAll('.mark-read').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
                 const id = this.getAttribute('data-id');
-                fetch(`/notifikasi/${id}/tandai-dibaca`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            window.location.reload();
-                        }
-                    });
+                const notifItem = this.closest('.notif-item');
+
+                // Animasi ketika notifikasi ditandai sebagai dibaca
+                notifItem.classList.add('animate__animated', 'animate__fadeOutLeft');
+
+                setTimeout(() => {
+                    fetch(`/notifikasi/${id}/tandai-dibaca`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                notifItem.classList.remove('unread');
+                                notifItem.classList.remove('animate__fadeOutLeft');
+                                notifItem.classList.add('animate__fadeInRight');
+
+                                window.showNotification('Berhasil', 'Notifikasi ditandai sebagai dibaca', 'success');
+                                this.remove(); // Hapus tombol tandai dibaca
+                            }
+                        });
+                }, 500);
             });
         });
 
-        // Delete individual notification
+        // Delete individual notification dengan animasi
         document.querySelectorAll('.delete-form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                if(confirm('Hapus notifikasi ini?')) {
-                    this.submit();
-                }
+                const notifItem = this.closest('.notif-item');
+
+                // Ganti konfirmasi standar dengan SweetAlert
+                window.deleteConfirm(
+                    'Hapus Notifikasi?',
+                    'Notifikasi ini akan dihapus permanen.'
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        // Animasi hapus
+                        notifItem.classList.add('animate__animated', 'animate__zoomOut');
+
+                        setTimeout(() => {
+                            this.submit();
+                        }, 500);
+                    }
+                });
             });
         });
     });

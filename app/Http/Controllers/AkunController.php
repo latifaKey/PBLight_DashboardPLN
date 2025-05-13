@@ -27,9 +27,25 @@ class AkunController extends Controller
     /**
      * Menampilkan daftar semua akun pengguna
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('name')->get();
+        $perPage = $request->input('perPage', 10); // Default 10 per page, bisa diubah
+        $users = User::orderBy('name')
+            ->when($request->input('search'), function($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%")
+                             ->orWhere('role', 'like', "%{$search}%");
+            })
+            ->paginate($perPage);
+
+        // Pastikan setiap user memiliki nama yang valid
+        $users->getCollection()->transform(function ($user) {
+            if (empty($user->name)) {
+                $user->name = 'Pengguna #' . $user->id;
+            }
+            return $user;
+        });
+
         return view('akun.index', compact('users'));
     }
 
@@ -68,30 +84,49 @@ class AkunController extends Controller
             'role' => 'required|string|in:asisten_manager,pic_keuangan,pic_manajemen_risiko,pic_sekretaris_perusahaan,pic_perencanaan_operasi,pic_pengembangan_bisnis,pic_human_capital,pic_k3l,pic_perencanaan_korporat,pic_hukum,karyawan',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+        try {
+            // Periksa apakah koneksi database sudah benar
+            if (!\DB::connection()->getPdo()) {
+                throw new \Exception('Database connection failed');
+            }
 
-        // Catat log aktivitas
-        AktivitasLog::log(
-            Auth::user(),
-            'create',
-            'Membuat akun baru: ' . $user->name . ' (' . $user->role . ')',
-            'Menambahkan akun pengguna baru',
-            $user,
-            [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'role' => $user->role,
-            ],
-            $request->ip(),
-            $request->userAgent()
-        );
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ]);
 
-        return redirect()->route('akun.index')->with('success', 'Akun berhasil dibuat.');
+            // Verifikasi apakah user benar-benar dibuat
+            $createdUser = User::find($user->id);
+            if (!$createdUser) {
+                throw new \Exception('User was not properly created in the database');
+            }
+
+            // Catat log aktivitas
+            AktivitasLog::log(
+                Auth::user(),
+                'create',
+                'Membuat akun baru: ' . $user->name . ' (' . $user->role . ')',
+                'Menambahkan akun pengguna baru',
+                $user,
+                [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ],
+                $request->ip(),
+                $request->userAgent()
+            );
+
+            return redirect()->route('akun.index')->with('success', 'Akun berhasil dibuat.');
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Error creating user account: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+
+            return redirect()->back()->with('error', 'Gagal membuat akun: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -135,48 +170,68 @@ class AkunController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|string|in:asisten_manager,pic_keuangan,pic_manajemen_risiko,pic_sekretaris_perusahaan,pic_perencanaan_operasi,pic_pengembangan_bisnis,pic_human_capital,pic_k3l,pic_perencanaan_korporat,pic_hukum,karyawan',
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
-
-        // Simpan data lama untuk log
-        $oldRole = $user->role;
-
-        $updateData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
         ];
 
-        // Update password jika ada
+        // Tambahkan validasi password hanya jika diisi
         if ($request->filled('password')) {
-            $updateData['password'] = Hash::make($request->password);
+            $rules['password'] = 'string|min:8|confirmed';
         }
 
-        $user->update($updateData);
+        $request->validate($rules);
 
-        // Catat log aktivitas
-        AktivitasLog::log(
-            Auth::user(),
-            'update',
-            'Mengupdate akun: ' . $user->name,
-            'Mengubah data akun pengguna',
-            $user,
-            [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'role_lama' => $oldRole,
-                'role_baru' => $user->role,
-                'password_diubah' => $request->filled('password'),
-            ],
-            $request->ip(),
-            $request->userAgent()
-        );
+        try {
+            // Simpan data lama untuk log
+            $oldRole = $user->role;
 
-        return redirect()->route('akun.index')->with('success', 'Akun berhasil diperbarui.');
+            $updateData = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'role' => $request->role,
+            ];
+
+            // Update password jika ada
+            if ($request->filled('password')) {
+                $updateData['password'] = Hash::make($request->password);
+            }
+
+            $user->update($updateData);
+
+            // Verifikasi apakah update berhasil
+            $updatedUser = User::find($user->id);
+            if (!$updatedUser || $updatedUser->name !== $request->name || $updatedUser->email !== $request->email || $updatedUser->role !== $request->role) {
+                throw new \Exception('User data was not properly updated in the database');
+            }
+
+            // Catat log aktivitas
+            AktivitasLog::log(
+                Auth::user(),
+                'update',
+                'Mengupdate akun: ' . $user->name,
+                'Mengubah data akun pengguna',
+                $user,
+                [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role_lama' => $oldRole,
+                    'role_baru' => $user->role,
+                    'password_diubah' => $request->filled('password'),
+                ],
+                $request->ip(),
+                $request->userAgent()
+            );
+
+            return redirect()->route('akun.index')->with('success', 'Akun berhasil diperbarui.');
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Error updating user account: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+
+            return redirect()->back()->with('error', 'Gagal memperbarui akun: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**

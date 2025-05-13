@@ -39,43 +39,94 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        // Menyiapkan kredensial
-        $credentials = $request->only('email', 'password');
+        try {
+            // Verifikasi apakah user ada di database
+            $user = User::where('email', $request->email)->first();
 
-        // Cek kredensial dan login
-        if (Auth::attempt($credentials)) {
-            // Regenerasi session untuk menghindari serangan session fixation
-            $request->session()->regenerate();
+            if (!$user) {
+                // Log untuk debugging
+                \Log::warning('Login attempt failed: User not found', [
+                    'email' => $request->email,
+                    'ip' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]);
 
-            // Cek apakah role pengguna diperbolehkan
-            $allowedRoles = [
-                'asisten_manager',
-                'pic_keuangan',
-                'pic_manajemen_risiko',
-                'pic_sekretaris_perusahaan',
-                'pic_perencanaan_operasi',
-                'pic_pengembangan_bisnis',
-                'pic_human_capital',
-                'pic_k3l',
-                'pic_perencanaan_korporat',
-                'pic_hukum',
-                'karyawan',
-            ];
-
-            // Jika role valid, arahkan ke dashboard sesuai role
-            if (in_array(Auth::user()->role, $allowedRoles)) {
-                return $this->redirectBasedOnRole();
+                return back()
+                    ->withInput($request->only('email'))
+                    ->with('error', 'Email tidak ditemukan. Silakan periksa kembali email Anda.');
             }
 
-            // Jika role tidak diperbolehkan
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Role Anda tidak diizinkan untuk login.');
-        }
+            // Menyiapkan kredensial
+            $credentials = $request->only('email', 'password');
 
-        // Jika login gagal
-        return back()
-            ->withInput($request->only('email'))
-            ->with('error', 'Email atau password salah. Silakan coba lagi.');
+            // Cek kredensial dan login
+            if (Auth::attempt($credentials)) {
+                // Regenerasi session untuk menghindari serangan session fixation
+                $request->session()->regenerate();
+
+                // Log sukses login
+                \Log::info('User logged in successfully', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'ip' => $request->ip()
+                ]);
+
+                // Cek apakah role pengguna diperbolehkan
+                $allowedRoles = [
+                    'asisten_manager',
+                    'pic_keuangan',
+                    'pic_manajemen_risiko',
+                    'pic_sekretaris_perusahaan',
+                    'pic_perencanaan_operasi',
+                    'pic_pengembangan_bisnis',
+                    'pic_human_capital',
+                    'pic_k3l',
+                    'pic_perencanaan_korporat',
+                    'pic_hukum',
+                    'karyawan',
+                ];
+
+                // Jika role valid, arahkan ke dashboard sesuai role
+                if (in_array(Auth::user()->role, $allowedRoles)) {
+                    return $this->redirectBasedOnRole();
+                }
+
+                // Jika role tidak diperbolehkan
+                \Log::warning('Login attempt failed: Invalid role', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'ip' => $request->ip()
+                ]);
+
+                Auth::logout();
+                return redirect()->route('login')->with('error', 'Role Anda tidak diizinkan untuk login.');
+            }
+
+            // Log password salah
+            \Log::warning('Login attempt failed: Invalid password', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
+            // Jika login gagal
+            return back()
+                ->withInput($request->only('email'))
+                ->with('error', 'Email atau password salah. Silakan coba lagi.');
+
+        } catch (\Exception $e) {
+            \Log::error('Login error: ' . $e->getMessage(), [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()
+                ->withInput($request->only('email'))
+                ->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi nanti.');
+        }
     }
 
     /**

@@ -181,6 +181,15 @@
         </div>
 
         <div class="form-group">
+            <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control"
+                   placeholder="Ketik ulang password" required>
+            @error('password_confirmation')
+                <span class="form-validation-error">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label for="role" class="form-label">Peran</label>
             <select id="role" name="role" class="form-control form-select" required>
                 <option value="">-- Pilih Peran --</option>

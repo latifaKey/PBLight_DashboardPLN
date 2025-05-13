@@ -4,423 +4,434 @@
 @section('page_title', 'DETAIL RIWAYAT KPI')
 
 @section('styles')
+<link rel="stylesheet" href="{{ asset('pln-animations.css') }}">
 <style>
     .riwayat-detail-container {
         background: var(--pln-accent-bg);
         border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 5px 20px var(--pln-shadow);
+        padding: 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1),
+                    0 5px 15px rgba(0, 123, 255, 0.1),
+                    inset 0 -2px 2px rgba(255, 255, 255, 0.08);
         margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--pln-border);
+        transition: all 0.4s ease;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    .riwayat-detail-container:hover {
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15),
+                    0 8px 25px rgba(0, 123, 255, 0.15),
+                    inset 0 -2px 2px rgba(255, 255, 255, 0.1);
+        transform: translateY(-5px);
     }
 
     .indikator-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 20px;
-        background: var(--pln-surface);
-        padding: 15px 20px;
+        margin-bottom: 25px;
+        background: linear-gradient(135deg, var(--pln-surface), rgba(255, 255, 255, 0.05));
+        padding: 20px 25px;
         border-radius: 12px;
         border-left: 5px solid var(--pln-blue);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .indikator-header:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .indikator-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 70%);
+        z-index: 1;
     }
 
     .indikator-title {
         margin: 0;
         font-size: 1.5rem;
         color: var(--pln-blue);
+        font-weight: 700;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .indikator-header:hover .indikator-title {
+        transform: translateX(5px);
     }
 
     .indikator-subtitle {
         font-size: 1rem;
         color: var(--pln-text-secondary);
-        margin-top: 5px;
+        margin-top: 8px;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .indikator-subtitle i {
+        background: rgba(0, 123, 255, 0.1);
+        padding: 5px;
+        border-radius: 50%;
+        margin-right: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .indikator-header:hover .indikator-subtitle i {
+        transform: rotate(15deg);
+        background: rgba(0, 123, 255, 0.2);
     }
 
     .indikator-code {
-        background: var(--pln-light-blue);
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
         color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: 500;
-        margin-right: 10px;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        margin-right: 12px;
+        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.2);
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .indikator-header:hover .indikator-code {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
     }
 
     .riwayat-table {
         width: 100%;
         border-collapse: separate;
-        border-spacing: 0;
-        margin-bottom: 20px;
+        border-spacing: 0 8px;
+        margin-bottom: 30px;
     }
 
     .riwayat-table th {
         background: linear-gradient(90deg, var(--pln-blue), var(--pln-light-blue));
         color: white;
-        padding: 12px 15px;
+        padding: 15px;
         text-align: center;
         font-weight: 600;
         position: sticky;
         top: 0;
         z-index: 10;
+        text-transform: uppercase;
+        font-size: 13px;
+        white-space: nowrap;
     }
 
     .riwayat-table th:first-child {
-        border-top-left-radius: 8px;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
     }
 
     .riwayat-table th:last-child {
-        border-top-right-radius: 8px;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
     }
 
     .riwayat-table td {
-        padding: 12px 15px;
-        border-bottom: 1px solid var(--pln-border);
+        padding: 15px;
+        border: none;
+        background: rgba(255, 255, 255, 0.03);
+        transition: all 0.3s ease;
+        vertical-align: middle;
         text-align: center;
     }
 
-    .riwayat-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .riwayat-table tr:hover td {
-        background-color: rgba(0, 156, 222, 0.05);
-    }
-
-    .riwayat-table .text-success {
-        color: #28a745 !important;
-        font-weight: 600;
-    }
-
-    .riwayat-table .text-warning {
-        color: #ffc107 !important;
-        font-weight: 600;
-    }
-
-    .riwayat-table .text-danger {
-        color: #dc3545 !important;
-        font-weight: 600;
-    }
-
-    .riwayat-sections {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    @media (max-width: 992px) {
-        .riwayat-sections {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .riwayat-section {
-        background: var(--pln-surface);
+    .riwayat-table tbody tr {
+        transition: all 0.3s ease;
         border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--pln-border);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
 
-    .riwayat-section-title {
-        font-size: 1.2rem;
-        color: var(--pln-blue);
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--pln-border);
-        display: flex;
-        align-items: center;
+    .riwayat-table tbody tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
 
-    .riwayat-section-title i {
-        margin-right: 10px;
+    .riwayat-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.05);
     }
 
-    .finalisasi-form {
-        background: var(--pln-surface);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-        border: 1px solid var(--pln-border);
+    .riwayat-table tbody tr td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
     }
 
-    .finalisasi-form-title {
-        font-size: 1.2rem;
-        color: var(--pln-blue);
-        margin-bottom: 15px;
-    }
-
-    .bulan-name {
-        font-weight: 600;
+    .riwayat-table tbody tr td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
     }
 
     .nilai-badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-    }
-
-    .back-button {
-        margin-bottom: 20px;
-    }
-
-    .nilai-chart-container {
-        height: 300px;
-        margin-top: 30px;
-    }
-
-    .finalisasi-button {
-        margin-top: 5px;
-        display: inline-block;
-    }
-
-    .status-badge {
-        padding: 5px 10px;
+        padding: 6px 10px;
         border-radius: 20px;
-        font-size: 0.8rem;
         font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
     }
 
-    .status-finalisasi {
-        background: rgba(40, 167, 69, 0.1);
-        color: #28a745;
-        border: 1px solid rgba(40, 167, 69, 0.2);
+    .nilai-badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
 
-    .status-pending {
-        background: rgba(255, 193, 7, 0.1);
-        color: #ffc107;
-        border: 1px solid rgba(255, 193, 7, 0.2);
+    .nilai-bagus {
+        background: linear-gradient(135deg, #28a745, #5bba6f);
+        color: white;
     }
 
-    .status-need-verification {
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-        border: 1px solid rgba(220, 53, 69, 0.2);
+    .nilai-cukup {
+        background: linear-gradient(135deg, #ffc107, #ffdb4d);
+        color: #333;
+    }
+
+    .nilai-kurang {
+        background: linear-gradient(135deg, #dc3545, #ef5350);
+        color: white;
+    }
+
+    .btn-kembali {
+        background: linear-gradient(135deg, var(--pln-blue), var(--pln-light-blue));
+        border: none;
+        border-radius: 30px;
+        padding: 10px 22px;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-kembali i {
+        margin-right: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-kembali:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        color: white;
+    }
+
+    .btn-kembali:hover i {
+        transform: translateX(-3px);
+    }
+
+    .btn-kembali::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: 0.5s;
+    }
+
+    .btn-kembali:hover::before {
+        left: 100%;
+    }
+
+    .periode-title {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(0, 123, 255, 0.1);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 3px solid var(--pln-blue);
+    }
+
+    .periode-title i {
+        margin-right: 10px;
+        color: var(--pln-blue);
+    }
+
+    .info-section {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid var(--pln-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .info-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
     }
 </style>
 @endsection
 
 @section('content')
-<div class="back-button">
-    <a href="{{ route('kpi.history', ['tahun' => $tahun]) }}" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left me-2"></i> Kembali ke Riwayat KPI
-    </a>
-</div>
+<div class="container-fluid">
+    <div class="row fade-in-up">
+        <div class="col-md-12">
+            <div class="card shadow-soft glass-morphism">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="text-gradient mb-0">
+                            <i class="fas fa-history mr-2"></i> Detail Riwayat KPI
+                        </h5>
+                        <a href="{{ route('kpi.history') }}" class="btn-kembali">
+                            <i class="fas fa-arrow-left"></i> Kembali ke Riwayat
+                        </a>
+                    </div>
 
-<div class="riwayat-detail-container">
-    <div class="indikator-header">
-        <div>
-            <h2 class="indikator-title">
-                <span class="indikator-code">{{ $indikator->kode }}</span>
-                {{ $indikator->nama }}
-            </h2>
-            <div class="indikator-subtitle">
-                <i class="fas fa-building me-2"></i> {{ $indikator->bidang->nama ?? 'Tidak ada bidang' }}
-                <span class="ms-3"><i class="fas fa-calendar me-2"></i> Tahun {{ $tahun }}</span>
-            </div>
-        </div>
-        <div>
-            <button type="button" class="btn btn-success" onclick="exportData('excel')">
-                <i class="fas fa-file-excel me-1"></i> Export Excel
-            </button>
-            <button type="button" class="btn btn-danger" onclick="exportData('pdf')">
-                <i class="fas fa-file-pdf me-1"></i> Export PDF
-            </button>
-        </div>
-    </div>
+                    <div class="periode-title fade-in delay-100">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Periode: {{ $periodeKpi->tahun }} - {{ $periodeKpi->periode }}</span>
+                    </div>
 
-    <div class="riwayat-sections">
-        <div class="riwayat-section">
-            <div class="riwayat-section-title">
-                <i class="fas fa-chart-line"></i> Grafik Pencapaian {{ $tahun }}
-            </div>
-            <div class="nilai-chart-container">
-                <canvas id="nilaiChart"></canvas>
-            </div>
-        </div>
+                    <div class="info-section fade-in-up delay-200">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td width="30%"><strong>NIP</strong></td>
+                                        <td>: {{ $kpi->pegawai->nip }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nama</strong></td>
+                                        <td>: {{ $kpi->pegawai->nama }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Jabatan</strong></td>
+                                        <td>: {{ $kpi->pegawai->jabatan }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td width="40%"><strong>Unit</strong></td>
+                                        <td>: {{ $kpi->pegawai->unit->nama }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tanggal Penilaian</strong></td>
+                                        <td>: {{ \Carbon\Carbon::parse($kpi->tanggal_penilaian)->translatedFormat('d F Y') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status</strong></td>
+                                        <td>:
+                                            <span class="status-badge status-badge-info">
+                                                <i class="fas fa-check-circle"></i> Final
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="riwayat-section">
-            <div class="riwayat-section-title">
-                <i class="fas fa-info-circle"></i> Informasi Indikator
-            </div>
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <td width="30%"><strong>Kode</strong></td>
-                        <td>{{ $indikator->kode }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Nama</strong></td>
-                        <td>{{ $indikator->nama }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Deskripsi</strong></td>
-                        <td>{{ $indikator->deskripsi ?? 'Tidak ada deskripsi' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Satuan</strong></td>
-                        <td>{{ $indikator->satuan ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Bobot</strong></td>
-                        <td>{{ $indikator->bobot ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Tipe Target</strong></td>
-                        <td>{{ $indikator->tipe_target ?? 'Standar' }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Status</strong></td>
-                        <td>
-                            @if($indikator->aktif)
-                                <span class="badge bg-success">Aktif</span>
-                            @else
-                                <span class="badge bg-danger">Tidak Aktif</span>
-                            @endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    @foreach($indikator as $i)
+                    <div class="riwayat-detail-container fade-in-up delay-300">
+                        <div class="indikator-header">
+                            <div>
+                                <h4 class="indikator-title">
+                                    <span class="indikator-code">{{ $i->kode }}</span>
+                                    {{ $i->nama }}
+                                </h4>
+                                <p class="indikator-subtitle">
+                                    <i class="fas fa-tag"></i> {{ $i->perspektif }}
+                                    <span class="status-badge status-badge-info ml-2" style="font-size: 0.7rem;">
+                                        Bobot: {{ $i->bobot }}%
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
 
-    <div class="table-responsive">
-        <table class="riwayat-table">
-            <thead>
-                <tr>
-                    <th>Bulan</th>
-                    <th>Target</th>
-                    <th>Realisasi</th>
-                    <th>Pencapaian (%)</th>
-                    <th>Status</th>
-                    <th>Finalisasi</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $namaBulan = [
-                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                    ];
-                @endphp
+                        <div class="table-responsive">
+                            <table class="riwayat-table">
+                                <thead>
+                                    <tr>
+                                        <th>Target</th>
+                                        <th>Realisasi</th>
+                                        <th>Formula</th>
+                                        <th>Polaritas</th>
+                                        <th>Nilai</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($i->details as $detail)
+                                    <tr class="fade-in delay-400">
+                                        <td>{{ $detail->target }}</td>
+                                        <td>{{ $detail->realisasi }}</td>
+                                        <td>{{ $detail->formula }}</td>
+                                        <td>{{ $detail->polaritas }}</td>
+                                        <td>
+                                            @php
+                                                $nilaiClass = 'nilai-kurang';
+                                                if ($detail->nilai >= 90) {
+                                                    $nilaiClass = 'nilai-bagus';
+                                                } elseif ($detail->nilai >= 70) {
+                                                    $nilaiClass = 'nilai-cukup';
+                                                }
+                                            @endphp
+                                            <span class="nilai-badge {{ $nilaiClass }}">
+                                                {{ $detail->nilai }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $detail->keterangan }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @endforeach
 
-                @foreach($nilaiKPIs as $nilai)
-                    @php
-                        $persentaseClass = '';
-                        if($nilai->persentase >= 80) $persentaseClass = 'text-success';
-                        elseif($nilai->persentase >= 60) $persentaseClass = 'text-warning';
-                        elseif($nilai->persentase > 0) $persentaseClass = 'text-danger';
-
-                        $riwayat = $nilaiRiwayat->where('bulan', $nilai->bulan)->first();
-                        $statusLabel = '';
-                        $statusClass = '';
-
-                        if ($riwayat) {
-                            $statusLabel = 'Finalisasi';
-                            $statusClass = 'status-finalisasi';
-                        } elseif ($nilai->diverifikasi) {
-                            $statusLabel = 'Menunggu Finalisasi';
-                            $statusClass = 'status-pending';
-                        } else {
-                            $statusLabel = 'Belum Diverifikasi';
-                            $statusClass = 'status-need-verification';
-                        }
-                    @endphp
-
-                    <tr>
-                        <td class="bulan-name">{{ $namaBulan[$nilai->bulan] }}</td>
-                        <td>{{ number_format($nilai->target, 2) }} {{ $indikator->satuan }}</td>
-                        <td>{{ number_format($nilai->nilai, 2) }} {{ $indikator->satuan }}</td>
-                        <td class="{{ $persentaseClass }}">
-                            <span class="nilai-badge" style="background: rgba({{ $persentaseClass == 'text-success' ? '40, 167, 69, 0.1' : ($persentaseClass == 'text-warning' ? '255, 193, 7, 0.1' : '220, 53, 69, 0.1') }});">
-                                {{ number_format($nilai->persentase, 2) }}%
-                            </span>
-                        </td>
-                        <td>
-                            <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
-                        </td>
-                        <td>
-                            @if($riwayat)
-                                <div>{{ $riwayat->finalisasi_tanggal->format('d M Y') }}</div>
-                                <small>oleh {{ $riwayat->finalisasiUser->name ?? 'Unknown' }}</small>
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td>
-                            @if(!$riwayat && $nilai->diverifikasi)
-                                <button type="button" class="btn btn-sm btn-primary"
-                                        onclick="showFinalisasiModal({{ $nilai->id }}, '{{ $namaBulan[$nilai->bulan] }}', {{ $nilai->persentase }})">
-                                    <i class="fas fa-check-circle me-1"></i> Finalisasi
-                                </button>
-                            @elseif($riwayat)
-                                <button type="button" class="btn btn-sm btn-info"
-                                        onclick="showRiwayatDetail({{ $riwayat->id }})">
-                                    <i class="fas fa-eye me-1"></i> Detail
-                                </button>
-                            @else
-                                <button type="button" class="btn btn-sm btn-secondary" disabled>
-                                    <i class="fas fa-clock me-1"></i> Tunggu Verifikasi
-                                </button>
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal Finalisasi -->
-<div class="modal fade" id="finalisasiModal" tabindex="-1" aria-labelledby="finalisasiModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="finalisasiModalLabel">Finalisasi Nilai KPI</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="" method="POST" id="finalisasiForm">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <span class="finalisasi-info mb-3 d-block">
-                            Anda akan memfinalisasi nilai KPI <strong id="finalisasiBulan"></strong> dengan pencapaian <strong id="finalisasiPersentase"></strong>%.
-                            <br>Data yang sudah difinalisasi akan disimpan dalam riwayat.
-                        </span>
-
-                        <label for="keterangan" class="form-label">Keterangan (opsional)</label>
-                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan jika diperlukan..."></textarea>
+                    <div class="row fade-in-up delay-500">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="info-section text-center">
+                                <h5 class="gradient-text mb-3">Nilai Akhir KPI</h5>
+                                <div class="d-flex justify-content-center align-items-center mb-3">
+                                    @php
+                                        $nilaiAkhirClass = 'nilai-kurang';
+                                        if ($kpi->nilai_akhir >= 90) {
+                                            $nilaiAkhirClass = 'nilai-bagus';
+                                        } elseif ($kpi->nilai_akhir >= 70) {
+                                            $nilaiAkhirClass = 'nilai-cukup';
+                                        }
+                                    @endphp
+                                    <div class="nilai-badge {{ $nilaiAkhirClass }} pulse" style="font-size: 1.5rem; padding: 10px 25px;">
+                                        {{ $kpi->nilai_akhir }}
+                                    </div>
+                                </div>
+                                <div class="text-muted">
+                                    <strong>Penilaian Terverifikasi</strong><br>
+                                    <small>{{ \Carbon\Carbon::parse($kpi->tanggal_verifikasi)->translatedFormat('d F Y H:i') }}</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Finalisasi</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Detail Riwayat -->
-<div class="modal fade" id="detailRiwayatModal" tabindex="-1" aria-labelledby="detailRiwayatModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailRiwayatModalLabel">Detail Riwayat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="detailRiwayatContent">
-                <!-- Akan diisi dengan AJAX -->
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -428,147 +439,51 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeChart();
-    });
+    $(document).ready(function() {
+        // Menambahkan efek animasi saat halaman dimuat
+        $('.fade-in').css('opacity', 0).animate({
+            opacity: 1
+        }, 500);
 
-    function initializeChart() {
-        const ctx = document.getElementById('nilaiChart').getContext('2d');
-
-        // Data bulan
-        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-
-        // Ambil data dari nilaiKPIs untuk performa chart
-        const nilaiData = [];
-        const targetData = [];
-
-        @foreach($nilaiKPIs->sortBy('bulan') as $nilai)
-            nilaiData.push({{ $nilai->persentase }});
-            targetData.push(100); // Target ideal 100%
-        @endforeach
-
-        // Data riwayat yang sudah difinalisasi
-        const riwayatData = Array(12).fill(null);
-
-        @foreach($nilaiRiwayat as $riwayat)
-            riwayatData[{{ $riwayat->bulan - 1 }}] = {{ $riwayat->persentase }};
-        @endforeach
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Persentase Pencapaian',
-                        data: nilaiData,
-                        borderColor: 'rgba(0, 123, 255, 0.7)',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    },
-                    {
-                        label: 'Finalisasi',
-                        data: riwayatData,
-                        borderColor: 'rgba(40, 167, 69, 0.7)',
-                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
-                        borderWidth: 0,
-                        pointRadius: 6,
-                        pointStyle: 'rectRot',
-                        pointBorderWidth: 0,
-                        type: 'scatter'
-                    },
-                    {
-                        label: 'Target Ideal',
-                        data: targetData,
-                        borderColor: 'rgba(220, 53, 69, 0.5)',
-                        borderWidth: 1,
-                        borderDash: [5, 5],
-                        fill: false,
-                        pointRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Pencapaian KPI {{ $indikator->nama }} ({{ $tahun }})',
-                        font: {
-                            size: 14
-                        }
-                    },
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                if (context.dataset.label === 'Finalisasi' && context.parsed.y !== null) {
-                                    return 'Finalisasi: ' + context.parsed.y.toFixed(2) + '%';
-                                }
-                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 120,
-                        title: {
-                            display: true,
-                            text: 'Persentase Pencapaian (%)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Bulan'
-                        }
-                    }
-                }
-            }
+        // Animasi untuk container detail riwayat
+        $('.riwayat-detail-container').each(function(index) {
+            $(this).css({
+                'opacity': 0,
+                'transform': 'translateY(20px)'
+            }).delay(300 + (index * 100)).animate({
+                'opacity': 1,
+                'transform': 'translateY(0)'
+            }, 500);
         });
-    }
 
-    function showFinalisasiModal(nilaiId, bulan, persentase) {
-        document.getElementById('finalisasiBulan').textContent = bulan;
-        document.getElementById('finalisasiPersentase').textContent = persentase.toFixed(2);
-        document.getElementById('finalisasiForm').action = "{{ route('kpi.finalisasi', '') }}/" + nilaiId;
+        // Efek hover pada baris tabel
+        $('.riwayat-table tbody tr').hover(
+            function() {
+                $(this).addClass('shadow-hover');
+            },
+            function() {
+                $(this).removeClass('shadow-hover');
+            }
+        );
 
-        const modal = new bootstrap.Modal(document.getElementById('finalisasiModal'));
-        modal.show();
-    }
+        // Efek ripple pada tombol
+        $('.btn-kembali').on('click', function(e) {
+            let posX = e.pageX - $(this).offset().left;
+            let posY = e.pageY - $(this).offset().top;
 
-    function showRiwayatDetail(riwayatId) {
-        const modal = new bootstrap.Modal(document.getElementById('detailRiwayatModal'));
-        modal.show();
+            let ripple = $('<span class="ripple"></span>');
+            ripple.css({
+                left: posX + 'px',
+                top: posY + 'px'
+            });
 
-        // Implementasi AJAX untuk mengambil detail riwayat
-        // Ini bisa diimplementasikan nanti
-        document.getElementById('detailRiwayatContent').innerHTML = `
-            <div class="alert alert-info">
-                Detail riwayat akan ditampilkan di sini.
-                <br>ID Riwayat: ${riwayatId}
-            </div>
-        `;
-    }
+            $(this).append(ripple);
 
-    function exportData(type) {
-        const tahun = {{ $tahun }};
-        const indikatorId = {{ $indikator->id }};
-
-        if (type === 'excel') {
-            window.location.href = `{{ route('kpi.export.excel') }}?tahun=${tahun}&indikator_id=${indikatorId}`;
-        } else if (type === 'pdf') {
-            window.location.href = `{{ route('kpi.export.pdf') }}?tahun=${tahun}&indikator_id=${indikatorId}`;
-        }
-    }
+            setTimeout(function() {
+                ripple.remove();
+            }, 600);
+        });
+    });
 </script>
 @endsection
